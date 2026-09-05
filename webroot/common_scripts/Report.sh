@@ -1,5 +1,8 @@
 #!/system/bin/sh
 
+MODPATH="/data/adb/modules/playintegrityfix"
+. $MODPATH/common_func.sh
+
 OUT_DIR="/sdcard"
 OUT_FILE="$OUT_DIR/report.json"
 
@@ -15,19 +18,14 @@ json_array() {
 mask_fingerprint() {
     local FP
 
-    # Get fingerprint from getprop first
     FP="$(getprop ro.build.fingerprint 2>/dev/null)"
 
-    # Fallback to build.prop
     [ -z "$FP" ] && FP="$(grep -m1 '^ro.build.fingerprint=' /system/build.prop /vendor/build.prop 2>/dev/null | cut -d= -f2)"
 
-    # Fallback to pseudo fingerprint
     [ -z "$FP" ] && FP="$(getprop ro.product.brand 2>/dev/null)/$(getprop ro.product.device 2>/dev/null)/$(getprop ro.build.version.release 2>/dev/null)"
 
-    # Default if empty
     [ -z "$FP" ] && FP="unknown/unknown/unknown"
 
-    # Remove leading/trailing slashes
     FP="${FP#/}"
     FP="${FP%/}"
 
@@ -49,10 +47,8 @@ mask_fingerprint() {
 }
 
 # root implementation
-ROOT_IMPL="none"
-[ -d /data/adb/ksu/bin ] && ROOT_IMPL="kernelsu"
-[ -d /data/adb/ap/bin ] && ROOT_IMPL="apatch"
-[ -d /data/adb/magisk ] && ROOT_IMPL="magisk"
+ROOT_IMPL="$(detect_root_solution)"
+[ "$ROOT_IMPL" = "unknown" ] && ROOT_IMPL="none"
 
 # fingerprint
 FP_RAW="$(getprop ro.build.fingerprint)"
@@ -101,7 +97,7 @@ if [ -f "$PIF_FILE" ]; then
         first=1
       }
 
-      $1=="=verboseLogs" ||
+      $1=="verboseLogs" ||
       $1=="spoofApps" ||
       $1=="spoofBuild" ||
       $1=="spoofProps" ||

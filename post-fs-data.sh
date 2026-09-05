@@ -3,7 +3,6 @@ MODPATH="${0%/*}"
 . $MODPATH/common_func.sh
 
 boot="/data/adb/service.d"
-placeholder="$MODPATH/webroot/common_scripts"
 mkdir -p "$BOX/Integrity-Box-Logs"
 mkdir -p "$boot"
 
@@ -33,29 +32,24 @@ if [ -f "$BOX/disablegms" ]; then
     setprop persist.sys.kihooks.disable 1
 fi
 
-# Create all placeholder files only if they don't exist
-for file in kill aosp patch xml tee user hma ulock stop start nogms lineage selinux hide resetprop faq nuke zygisknext yesgms; do
-    [ -f "$placeholder/$file" ] || touch "$placeholder/$file"
-done
-
 # Verify backend perms
+_scripts="$MODPATH/webroot/common_scripts"
 for _f in \
     "$MODPATH/webroot/UpdateTranslation.sh" \
     "$boot/prop.sh" \
     "$boot/hash.sh" \
     "$boot/lineage.sh" \
     "$boot/.box_cleanup.sh" \
-    "$placeholder/teesim.sh" \
-    "$placeholder/autopilot.sh" \
-    "$placeholder/target.sh" \
-    "$placeholder/gms.sh" \
-    "$placeholder/webui.sh" \
-    "$placeholder/resetprop.sh" \
-    "$placeholder/Report.sh" \
-    "$placeholder/force_override.sh" \
-    "$placeholder/override_lineage.sh" \
-    "$placeholder/keymint.sh" \
-    "$placeholder/hma.sh"
+    "$_scripts/autopilot.sh" \
+    "$_scripts/target.sh" \
+    "$_scripts/gms.sh" \
+    "$_scripts/webui.sh" \
+    "$_scripts/resetprop.sh" \
+    "$_scripts/Report.sh" \
+    "$_scripts/force_override.sh" \
+    "$_scripts/override_lineage.sh" \
+    "$_scripts/keymint.sh" \
+    "$_scripts/hma.sh"
 do
     set_perm_if_needed "$_f" 755
 done
@@ -99,14 +93,8 @@ fi
 
 # Conditional early sensitive properties
 
-# Samsung
-resetprop_if_diff ro.boot.warranty_bit 0
-resetprop_if_diff ro.vendor.boot.warranty_bit 0
-resetprop_if_diff ro.vendor.warranty_bit 0
-resetprop_if_diff ro.warranty_bit 0
-
-# Realme
-resetprop_if_diff ro.boot.realmebootstate green
+# Shared warranty/debug/secure/Realme battery
+spoof_warranty_props
 
 # OnePlus
 resetprop_if_diff ro.is_ever_orange 0
@@ -120,14 +108,10 @@ done
 for PROP in $(resetprop | grep -oE 'ro.*.build.type'); do
     resetprop_if_diff $PROP user
 done
-resetprop_if_diff ro.adb.secure 1
 if ! $SKIPDELPROP; then
     delprop_if_exist ro.boot.verifiedbooterror
     delprop_if_exist ro.boot.verifyerrorpart
 fi
 resetprop_if_diff ro.boot.veritymode.managed yes
-resetprop_if_diff ro.debuggable 0
-resetprop_if_diff ro.force.debuggable 0
-resetprop_if_diff ro.secure 1
 
 exit 0

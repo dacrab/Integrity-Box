@@ -144,9 +144,6 @@ touch "$CPP" 2>/dev/null || true
 
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >>"$CPP"; }
 
-# Exit if offline
-#if ! megatron; then exit 1; fi
-
 # Show header
 print_header
 reset_tricky_store
@@ -231,9 +228,6 @@ fi
 # Expiry Handling
 if [ "$MIGRATE_OK" -eq 1 ] && [ -f "$BOX/remove_expiry" ]; then
     sed -i '/Released On:/d;/Estimated Expiry:/d' "$P"
-#    log_step "REMOVED" "Expiry comment removed"
-#else
-#    log_step "SKIPPED" "Expiry handling"
 fi
 
 # JSON Export
@@ -314,12 +308,6 @@ log_step "RESTART" "Google Service Processes"
 
 sh "$SCRIPT_DIR/cleanup.sh" >/dev/null 2>&1; 
 
-# Execute teesim.sh unless explicitly disabled
-if [ ! -e "$BOX/teesim" ]; then
-    sh "$SCRIPT_DIR/teesim.sh"
-    log_step "WRITING" "TEEsim Build fields"
-fi
-
 # Restore per-App-Spoofing value
 if [ -f "$P" ]; then
     if [ -f "$SPOOF_APPS" ]; then
@@ -369,7 +357,6 @@ fi
 echo " "
 echo " "
 echo "    -- ACTION COMPLETED SUCCESSFULLY --"
-#randomize_banner
 handle_delay
 
 # Special treatment for an AI-generated garbage module named SPECTER that removes IntegrityBox for no reason, 

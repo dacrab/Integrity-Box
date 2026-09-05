@@ -63,8 +63,7 @@ function popup(msg, type = "info") {
 }
 
 // Custom Paths Persistence
-async function loadCustomPaths() {
-  try {
+async function loadCustomPaths() {  try {
     const out = await sh(`cat ${BASE}/custom.conf 2>/dev/null`);
     CUSTOM = {};
     out.trim().split("\n").forEach(line => {
@@ -93,7 +92,6 @@ async function addCustomPath() {
     return;
   }
 
-  // Check if path exists
   if (!(await exists(p))) {
     alert("Path does not exist");
     return;
@@ -102,12 +100,11 @@ async function addCustomPath() {
   const name = p.split("/").pop();
   CUSTOM[name] = p;
   TARGETS = { ...PREDEFINED, ...CUSTOM };
-  await saveCustomPaths(); // persist
+  await saveCustomPaths();
   customPath.value = "";
   render();
 }
 
-// Render
 async function render() {
   list.innerHTML = "";
   for (const k in TARGETS) {
@@ -175,7 +172,6 @@ async function render() {
   }
 }
 
-// Run Cleaner
 async function runCleaner() {
   const keys = Object.keys(TARGETS);
   let done = 0;
@@ -217,7 +213,6 @@ async function runCleaner() {
   popup("Cleaner completed", "success");
 }
 
-// Unhide
 async function unhide() {
   await sh(`[ -f ${BASE}/last_action.sh ] && sh ${BASE}/last_action.sh`);
   await sh(`echo "[$(date)] UNHIDE" >> "${LOG}"`);

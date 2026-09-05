@@ -9,10 +9,8 @@ mkdir -p "$BOX_BRAIN/Integrity-Box-Logs" 2>/dev/null
 
 if [ -f "$MODPATH/common_func.sh" ]; then
     . "$MODPATH/common_func.sh"
-    LOG_FILE="$BOX_BRAIN/Integrity-Box-Logs/autorun.log"
-else
-    LOG_FILE="$BOX_BRAIN/Integrity-Box-Logs/autorun.log"
 fi
+LOG_FILE="$BOX_BRAIN/Integrity-Box-Logs/autorun.log"
 
 log() {
     echo "[$(date '+%H:%M:%S')] $1" >> "$LOG_FILE"

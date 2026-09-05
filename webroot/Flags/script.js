@@ -30,7 +30,6 @@ var ACTION_FLAGS=[
 
 var GENERAL_FLAGS=[
   {id:"keymint",title:"Update OMK build",label:"reboot",desc:"Forces to appear as Pixel Device & use latest security patch if using Oh My Keymint module"},
-  {id:"teesim",title:"Skip TEEsim",label:"reboot",desc:"This will skip modifications in config.json"},
   {id:"iframe_gesture_right",title:"Right Gestures",desc:"Enables right-hand-side back gesture swipe area in WebUI iframes."},
   {id:"iframe_back_button",title:"Floating Back",desc:"Adds a floating back button overlay for easier iframe navigation."},
   {id:"keyswitch",title:"DNS Poisoning:",desc:"This fixes keybox download errors in some regions"},

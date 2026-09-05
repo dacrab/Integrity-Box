@@ -14,9 +14,6 @@ mkdir -p "$LOG_DIR" || true
 mkdir -p "$MEOW"
 mkdir -p "$TRICKY"
 
-# Support Hot Installation
-#export MODULE_HOT_INSTALL_REQUEST="true"
-
 # Logger
 debug() {
     echo "$1" | tee -a "$INSTALL_LOG"

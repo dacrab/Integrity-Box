@@ -79,7 +79,7 @@ setup_resetprop() {
         magisk)
             # Check Magisk version for hexpatch fallback
             if [ -f /data/adb/magisk/util_functions.sh ]; then
-                MAGISK_VER=$(grep MAGISK_VER_CODE /data/adb/magisk/util_functions.sh | cut -d= -f2)
+                MAGISK_VER=$(grep -E '^MAGISK_VER_CODE=' /data/adb/magisk/util_functions.sh | tail -1 | cut -d= -f2 | tr -d '"')
                 [ "$MAGISK_VER" -lt 27003 ] 2>/dev/null && RESETPROP="resetprop_hexpatch" || RESETPROP="resetprop -n"
             else
                 RESETPROP="resetprop -n"
@@ -106,14 +106,10 @@ setup_resetprop() {
 set_perm_if_needed() {
     _file="$1"
     _perm="$2"
-    
-    # Skip if missing
+
     [ -e "$_file" ] || return 0
-    
-    # For 755: just check if owner executable bit is set
     [ -x "$_file" ] && return 0
-    
-    # Only chmod if not executable
+
     chmod "$_perm" "$_file" 2>/dev/null || true
 }
 
@@ -214,10 +210,10 @@ set_simpleprop() {
     local VALUE="$2"
     local CURRENT
 
-    CURRENT=$(su -c getprop "$PROP")
+    CURRENT=$(su -c "getprop $PROP")
 
     if [ -n "$CURRENT" ]; then
-        su -c setprop "$PROP" "$VALUE" >/dev/null 2>&1
+        su -c "setprop $PROP $VALUE" >/dev/null 2>&1
         chup "Set $PROP to $VALUE"
     else
         chup "Skipping $PROP, property does not exist"
@@ -451,6 +447,24 @@ delprop_if_exist() {
             setprop "$1" "" 2>/dev/null
             ;;
     esac
+}
+
+# Boot battery shared by post-fs-data.sh (early phase) and service.sh (late
+# phase): ROMs can revert these between phases, so both call it.
+spoof_warranty_props() {
+    # Warranty/Debug (Samsung)
+    resetprop_if_diff "ro.boot.warranty_bit" "0"
+    resetprop_if_diff "ro.warranty_bit" "0"
+    resetprop_if_diff "ro.vendor.boot.warranty_bit" "0"
+    resetprop_if_diff "ro.vendor.warranty_bit" "0"
+    # Debug
+    resetprop_if_diff "ro.debuggable" "0"
+    resetprop_if_diff "ro.force.debuggable" "0"
+    # Secure
+    resetprop_if_diff "ro.secure" "1"
+    resetprop_if_diff "ro.adb.secure" "1"
+    # Realme
+    resetprop_if_diff "ro.boot.realmebootstate" "green"
 }
 
 # persistprop <prop> <value>

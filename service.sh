@@ -43,15 +43,10 @@ resetprop_if_diff "vendor.boot.verifiedbootstate" "green"
 resetprop_if_diff "ro.boot.flash.locked" "1"
 resetprop_if_diff "ro.boot.veritymode" "enforcing"
 
-# Warranty/Debug
-resetprop_if_diff "ro.boot.warranty_bit" "0"
-resetprop_if_diff "ro.warranty_bit" "0"
-resetprop_if_diff "ro.vendor.boot.warranty_bit" "0"
-resetprop_if_diff "ro.vendor.warranty_bit" "0"
-resetprop_if_diff "ro.debuggable" "0"
-resetprop_if_diff "ro.force.debuggable" "0"
-resetprop_if_diff "ro.secure" "1"
-resetprop_if_diff "ro.adb.secure" "1"
+# Warranty/Debug/Secure/Realme battery shared with post-fs-data.sh
+spoof_warranty_props
+
+# OEM boot locks
 resetprop_if_diff "sys.oem_unlock_allowed" "0"
 
 # Build
@@ -60,7 +55,6 @@ resetprop_if_diff "ro.build.tags" "release-keys"
 
 # OEM-Specific
 resetprop_if_diff "ro.secureboot.lockstate" "locked"  # MIUI
-resetprop_if_diff "ro.boot.realmebootstate" "green"   # Realme
 resetprop_if_diff "ro.boot.realme.lockstate" "1"       # Realme
 
 # Recovery Mode Hiding
@@ -69,10 +63,6 @@ resetprop_if_match "ro.boot.bootmode" "recovery" "unknown"
 resetprop_if_match "vendor.boot.bootmode" "recovery" "unknown"
 
 # USB/ADB
-# Reset system properties if mismatch
-#[ -n "$(resetprop sys.usb.adb.disabled)" ] && [ "$(resetprop sys.usb.adb.disabled)" != "1" ] && resetprop sys.usb.adb.disabled 1
-#[ -n "$(resetprop service.adb.root)" ] && [ "$(resetprop service.adb.root)" != "0" ] && resetprop service.adb.root 0
-
 # Other props use normal function
 resetprop_if_diff persist.sys.developer_options 0
 resetprop_if_diff persist.sys.dev_mode 0
@@ -83,12 +73,6 @@ resetprop_if_diff ro.hardware.virtual_device 0
 # SELinux
 resetprop_if_diff "ro.boot.selinux" "enforcing"
 [ "$ROOT_SOL" = "magisk" ] && ! [ -f "$MODPATH/skipdelprop" ] && delprop_if_exist "ro.build.selinux"
-
-# Fix SELinux permissions if permissive
-#if [ "$(cat /sys/fs/selinux/enforce 2>/dev/null)" = "0" ]; then
-#    chmod 640 /sys/fs/selinux/enforce 2>/dev/null
-#    chmod 440 /sys/fs/selinux/policy 2>/dev/null
-#fi
 
 # Run compact after early props if supported
 run_compact
