@@ -87,7 +87,7 @@ if [ "$success" != "true" ]; then
     exit 1
 fi
 
-log "Download complete: $ZIP_PATH ($(get_size "$ZIP_PATH"))"
+log "Download complete: $ZIP_PATH ($(du -h "$ZIP_PATH" 2>/dev/null | cut -f1))"
 
 # Clean extraction directory
 log "Preparing extraction directory: $EXTRACT_DIR"

@@ -70,11 +70,6 @@ resetprop_if_match "ro.bootmode" "recovery" "unknown"
 resetprop_if_match "ro.boot.bootmode" "recovery" "unknown"
 resetprop_if_match "vendor.boot.bootmode" "recovery" "unknown"
 
-# USB/ADB
-# Reset system properties if mismatch
-#[ -n "$(resetprop sys.usb.adb.disabled)" ] && [ "$(resetprop sys.usb.adb.disabled)" != "1" ] && resetprop sys.usb.adb.disabled 1
-#[ -n "$(resetprop service.adb.root)" ] && [ "$(resetprop service.adb.root)" != "0" ] && resetprop service.adb.root 0
-
 # Other props use normal function
 resetprop_if_diff persist.sys.developer_options 0
 resetprop_if_diff persist.sys.dev_mode 0
@@ -86,90 +81,39 @@ resetprop_if_diff ro.hardware.virtual_device 0
 resetprop_if_diff "ro.boot.selinux" "enforcing"
 [ "$ROOT_SOL" = "magisk" ] && ! [ -f "$MODPATH/skipdelprop" ] && delprop_if_exist "ro.build.selinux"
 
-# Fix SELinux permissions if permissive
-#if [ "$(cat /sys/fs/selinux/enforce 2>/dev/null)" = "0" ]; then
-#    chmod 640 /sys/fs/selinux/enforce 2>/dev/null
-#    chmod 440 /sys/fs/selinux/policy 2>/dev/null
-#fi
-
 # Run compact after early props if supported
 run_compact
 wait_for_boot
 
-# Spoof Encryption 
-{
-  echo "ENCRYPT CHECK ($(date))"
-
-  if [ -f $BOX/encrypt ]; then
-    if grep -qxF "$PROP1" "$PROP"; then
-      echo "Prop already exists, no action needed"
+# Spoof encrypt/tag/build props: one loop, same behavior per flag
+for _spec in "encrypt|$PROP1|$LOG2" "tag|$PROP2|$LOG5" "build|$PROP3|$LOG6"; do
+  _flag="${_spec%%|*}"; _rest="${_spec#*|}"; _line="${_rest%%|*}"; _log="${_rest#*|}"
+  {
+    echo "$(printf '%s' "$_flag" | tr 'a-z' 'A-Z') CHECK ($(date))"
+    if [ -f "$BOX/$_flag" ]; then
+      if grep -qxF -- "$_line" "$PROP" 2>/dev/null; then
+        echo "Prop already exists, no action needed"
+      else
+        echo "$_line" >> "$PROP"
+        echo "Spoofed prop: $_line"
+      fi
     else
-      echo "$PROP1" >> "$PROP"
-      echo "Spoofed prop: $PROP1"
+      if grep -qxF -- "$_line" "$PROP" 2>/dev/null; then
+        sed -i "\|^${_line}$|d" "$PROP"
+        echo "Removed line: $_line"
+      else
+        echo "Prop not present, no action needed"
+      fi
     fi
-  else
-    if grep -qxF "$PROP1" "$PROP"; then
-      sed -i "\|^${PROP1}\$|d" "$PROP"
-      echo "Removed line: $PROP1"
-    else
-      echo "Prop not present, no action needed"
-    fi
-  fi
-
-  echo
-} >> "$LOG2" 2>&1
-
-# Spoof Tag 
-{
-  echo "TAG CHECK ($(date))"
-
-  if [ -f $BOX/tag ]; then
-    if grep -qxF "$PROP2" "$PROP"; then
-      echo "Prop already exists, no action needed"
-    else
-      echo "$PROP2" >> "$PROP"
-      echo "Spoofed prop: $PROP2"
-    fi
-  else
-    if grep -qxF "$PROP2" "$PROP"; then
-      sed -i "\|^${PROP2}\$|d" "$PROP"
-      echo "Removed line: $PROP2"
-    else
-      echo "Prop not present, no action needed"
-    fi
-  fi
-
-  echo
-} >> "$LOG5" 2>&1
-
-# Spoof Build 
-{
-  echo "BUILD CHECK ($(date))"
-
-  if [ -f $BOX/build ]; then
-    if grep -qxF "$PROP3" "$PROP"; then
-      echo "Prop already exists, no action needed"
-    else
-      echo "$PROP3" >> "$PROP"
-      echo "Spoofed prop: $PROP3"
-    fi
-  else
-    if grep -qxF "$PROP3" "$PROP"; then
-      sed -i "\|^${PROP3}\$|d" "$PROP"
-      echo "Removed line: $PROP3"
-    else
-      echo "Prop not present, no action needed"
-    fi
-  fi
-
-  echo
-} >> "$LOG6" 2>&1
+    echo
+  } >> "$_log" 2>&1
+done
 
 # Rename twrp folder to avoid root detection
 {
   echo "TWRP/FOX RENAME ($(date))"
   echo
-  [ -f $BOX/twrp ] && hide_recovery_folders
+  [ -f "$BOX/twrp" ] && hide_recovery_folders
 } >> "$LOG4" 2>&1
 
 # Hide PIF

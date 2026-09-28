@@ -69,7 +69,7 @@ if [ -e "$BOX/ota" ]; then
     touch "$BOX/safemode"
     echo " "
     echo " "
-    echo "  D O N E 👍 | REBOOT YOUR DEVICE"
+    echo "  DONE | REBOOT YOUR DEVICE"
     handle_delay
     exit 0
 fi
@@ -145,11 +145,6 @@ touch "$CPP" 2>/dev/null || true
 
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >>"$CPP"; }
 
-# Exit if offline
-#if ! megatron; then exit 1; fi
-
-# Show header
-print_header
 reset_tricky_store
 
 sh "$UPDATE" || { sleep 10; exit 1; }
@@ -450,8 +445,8 @@ log_step "RESTART" "Google Service Processes"
 
 sh "$SCRIPT_DIR/cleanup.sh" >/dev/null 2>&1; 
 
-# Execute teesim.sh unless explicitly disabled
-if [ ! -e "$BOX/teesim" ]; then
+# Execute teesim.sh unless explicitly disabled (script ships with TEEsim installs; skip when absent)
+if [ ! -e "$BOX/teesim" ] && [ -f "$SCRIPT_DIR/teesim.sh" ]; then
     sh "$SCRIPT_DIR/teesim.sh"
     log_step "WRITING" "TEEsim Build fields"
 fi
@@ -510,30 +505,6 @@ fi
   echo "description=$DESC" >> "$PROP"
 } || true
 
-echo " "
-echo " "
 echo "    -- ACTION COMPLETED SUCCESSFULLY --"
-#randomize_banner
 handle_delay
-
-# Special treatment for an AI-generated garbage module named SPECTER that removes IntegrityBox for no reason, 
-
-# It deliberately removes IntegrityBox under the vague excuse of a "conflict" without ever identifying or explaining any actual incompatibility. 
-
-# If a real conflict existed, it could've been documented instead of silently removing it.
-
-# We don't support misleading behavior or arbitrary decisions disguised as compatibility fixes 
-
-for path in \
-    "/data/adb/modules/specter" \
-    "/data/adb/specter" \
-    "/data/adb/modules_update/specter" \
-    "/sdcard/specter-update"
-do
-    [ -e "$path" ] && rm -rf "$path" 2>/dev/null || true
-done
-
-# https://github.com/dpejoh/specter/blob/489ca15ba02d8de781d275c5db8c502dbb255247/src/lib/conflicts.sh#L20
-
-# Looks more like another blind hater than someone acting in good faith. Anyway, I got you, bro.
 exit 0

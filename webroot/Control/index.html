@@ -347,20 +347,6 @@ h1 .material-icons{
   color:var(--success);
 }
 
-.beta-labels{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  font-size:12px;
-  font-weight:600;
-  color:var(--text2);
-  transition:color 0.3s;
-}
-.beta-labels .active-label{
-  color:var(--accent);
-  text-shadow:0 0 10px var(--accent-glow);
-}
-
 .ui-labels{
   display:flex;
   align-items:center;
@@ -552,22 +538,6 @@ h1 .material-icons{
   </button>
 
   <h1><span class="material-icons">security</span>IntegrityBox Toolkit</h1>
-
-  <div class="section-label">Update Channel</div>
-  <div class="row" id="beta" onclick="toggleBeta()">
-    <div class="icon-wrap"><span class="material-icons">update</span></div>
-    <div class="content">
-      <div class="title">OTA</div>
-    </div>
-    <div class="beta-labels">
-      <span id="labelStable" class="active-label">Stable</span>
-      <label class="switch" onclick="event.stopPropagation()">
-        <input id="betaInput" type="checkbox">
-        <span class="slider"><span class="knob"></span></span>
-      </label>
-      <span id="labelBeta">Beta</span>
-    </div>
-  </div>
 
   <div class="section-label">Quick Settings</div>
   <div class="row" id="zygisk" onclick="toggle('zygisk')">
@@ -820,8 +790,6 @@ h1 .material-icons{
 const DIR="/data/adb/Box-Brain";
 const PROP="/data/adb/modules/playintegrityfix/custom.pif.prop";
 const MOD_PROP="/data/adb/modules/playintegrityfix/module.prop";
-const STABLE_URL="https://raw.githubusercontent.com/MeowDump/Integrity-Box/refs/heads/main/release.json";
-const BETA_URL="https://raw.githubusercontent.com/MeowDump/Integrity-Box/refs/heads/main/beta-release/ota.json";
 const ZYGISK_DIR="/data/adb/zygisksu";
 const STYLE_SCRIPT="/data/adb/modules/playintegrityfix/webroot/common_scripts/UI/style.sh";
 const EXTRACT_BOOT_SCRIPT="/data/adb/modules/playintegrityfix/webroot/common_scripts/extract_boot.sh";
@@ -986,39 +954,6 @@ function showModeInfo(e){
   }
 }
 
-function getUpdateUrl(cb){
-  run("grep -m1 '^updateJson=' "+MOD_PROP+" | cut -d'=' -f2- || echo ''",cb);
-}
-
-function setUpdateUrl(url,cb){
-  run(
-    "if grep -q '^updateJson=' "+MOD_PROP+"; then " +
-    "sed -i 's|^updateJson=.*|updateJson="+url+"|' "+MOD_PROP+"; " +
-    "else " +
-    "printf '\\nupdateJson="+url+"\\n' >> "+MOD_PROP+"; " +
-    "fi",
-    cb
-  );
-}
-
-function updateBetaUI(isBeta){
-  var el=document.getElementById("beta");
-  el.classList.toggle("on",isBeta);
-  document.getElementById("betaInput").checked=isBeta;
-  document.getElementById("labelStable").classList.toggle("active-label",!isBeta);
-  document.getElementById("labelBeta").classList.toggle("active-label",isBeta);
-}
-
-function toggleBeta(){
-  var el=document.getElementById("beta");
-  var isBeta=!el.classList.contains("on");
-  var url=isBeta?BETA_URL:STABLE_URL;
-  setUpdateUrl(url,function(){
-    updateBetaUI(isBeta);
-    popup(isBeta?"Switched to Beta channel":"Switched to Stable channel","success");
-  });
-}
-
 function applyBg(isModern){
   if(isModern){
     document.body.classList.add("modern-bg");
@@ -1099,7 +1034,7 @@ function init(){
     setOn("verbose", d.verbose === "1");
     setOn("safemode", d.safemode === "1");
 
-    updateBetaUI(d.updateUrl === BETA_URL);
+    
     updateUiModeUI(d.modern === "1");
 
     var a = 3;

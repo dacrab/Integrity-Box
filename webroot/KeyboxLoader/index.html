@@ -500,9 +500,7 @@ async function scan(){
         clearInterval(poll);
         parseFiles(cur);
       }
-    }catch(e){
-      console.log("Poll error:",e);
-    }
+    }catch(e){}
     
     if(Date.now()-start>10000){
       clearInterval(poll);

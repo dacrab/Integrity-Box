@@ -26,7 +26,6 @@ TIMESTAMP=$(date '+%Y%m%d_%H%M%S')
 KEYBOX_BACKUP="$BACKUP_DIR/keybox_$TIMESTAMP.xml"
 FILE="/data/adb/modules/playintegrityfix/module.prop"
 DESC=$(grep '^description=' "$FILE" | sed 's| ✦ Synced on .*||' | cut -d= -f2-)
-NOW=$(date '+%d %B %I:%M %p')
 SIM_KEY="/data/adb/teesim/keybox.xml"
 
 log() {
@@ -307,4 +306,4 @@ if [ -d "/data/adb/teesim" ] && [ -s "$KEYBOX" ]; then
     log " ✪ Keybox added to TEEsim directory"
 fi
 
-sed -i "s|^description=.*|description=$DESC ✦ Synced on $NOW|" "$FILE"
+sed -i "s|^description=.*|description=$DESC|" "$FILE"

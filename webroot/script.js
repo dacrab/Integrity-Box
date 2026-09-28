@@ -22,22 +22,22 @@ const messageMap = {
   "propspoofer": { start: "These will be applied till reboot", type: "info" },
   "nogms": { success: "Reboot to apply changes", type: "info" },
   "yesgms": { start: "Reboot to apply changes", type: "info" },
-  "key.sh": { success: "Keybox has been updated ✅", type: "info" },
+  "key.sh": { success: "Keybox updated", type: "info" },
   "flags": { start: "These requires Reboot / Action", type: "info" },
-  "profile": { start: "Good Luck old friend 🌚", type: "info" },
+  "profile": { start: "Select integrity profile", type: "info" },
   "ctrl": { start: "For those using ROM inbuilt spoofing", type: "info" },
-  "force_override.sh": { start: "Done 👍", type: "info" },
+  "force_override.sh": { start: "Done", type: "info" },
   "pif": { start: "You can update fingerprint without internet", type: "info" },
   "vending": { start: "This will clear data of Play Services & Store", type: "info" },
-  "zygisknext": { start: "Whatever you say cutie 😉", type: "info" },
+  "zygisknext": { start: "ZygiskNext settings", type: "info" },
   "cache": { start: "This will delete temporary unnecessary files", type: "info" },
   "hide": { start: "This will hide basic sus paths", type: "info" },
   "scanner": { start: " Click on Run Scan", success: "Detection Complete", type: "info" },
   "support": { start: "Become a Supporter", type: "info" },
-  "report": { start: "What's wrong buddy?", type: "info" },
-  "assistant": { start: "Let me guide you to the right path", type: "info" },
+  "report": { start: "Describe the issue", type: "info" },
+  "assistant": { start: "Assistant", type: "info" },
   "status": { start: "Informs you about keybox & fingerprint validity", type: "info" },
-  "hma.sh": { success: "Done ✅", type: "info" },
+  "hma.sh": { success: "Done", type: "info" },
   "ulock": { success: "Done", type: "info" },
   "faq": { start: "Coming Soon", type: "info" },
   "nuke": { start: "Coming Soon", type: "info" },
@@ -45,7 +45,7 @@ const messageMap = {
   "spoofing": { start: "These are for custom ROM users", type: "info" },
   "pilot": { start: "Updates keybox & fp automatically whether a new key is available", type: "info" },
   "downloader": { start: "Some useful stuff you may need", type: "info" },
-  "hash": { start: "Paste your boot hash buddy", success: "Boot hash operation complete", type: "success" }
+  "hash": { start: "Paste your boot hash", success: "Boot hash operation complete", type: "success" }
 };
 
 const inlineMessageMap = {};

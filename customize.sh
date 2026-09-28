@@ -281,15 +281,7 @@ enable_recommended_settings() {
 # Final footer message
 display_footer() {
     debug "_________________________________________"
-    debug " "
     debug "             Installation Completed "
-    debug "    This module was released by 𝗠𝗘𝗢𝗪 𝗗𝗨𝗠𝗣"
-    debug " "
-    debug " "
-    debug " "
-    debug " "
-    debug " "
-    debug " "
 }
 
 # Main installation flow
@@ -304,7 +296,6 @@ install_module() {
     check_boot_hash
     enable_recommended_settings
     check_arch
-    release_source
 }
 
 echo "
@@ -330,12 +321,7 @@ elif [ ! -f "$MEOW/service.sh" ]; then
     fi
 fi
 
-# play stupid games, win stupid prizes 
-if [ -d /data/adb/modules/brene ] || [ -d /data/adb/modules_update/brene ]; then
-    rm -rf /data/adb/modules/brene /data/adb/modules_update/brene
-fi
-
-
+# Conflicting module id would load twice
 if [ -d /data/adb/modules/playintegrity ]; then
     rm -rf "/data/adb/modules/playintegrity"
 fi

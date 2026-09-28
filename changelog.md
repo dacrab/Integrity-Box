@@ -1,8 +1,17 @@
-> Release Date: 22/08/2026
+> Release Date: 27/09/2026
 
 ####  [🏆 Click here to support my work](https://meowdump.github.io/)
 
 # What's New?
+
+- Synced with upstream v43 (requirements, fingerprints, HMA config, PIF bump, key status)
+- Removed dead and unreachable code across shell scripts and WebUI
+- Removed duplicate boot-phase prop spoofing (single source in service.sh)
+- Simplified installer: structured logging, no chatty per-step output, no self-promotion edits
+- Simplified action runner: shared helpers for target list and injector config, no dead TEEsim hook
+- Hardened shell scripts: fixed unbound variables, arithmetic on empty values, word-splitting bugs
+- Cleaned repo: dropped beta OTA channel, stale placeholder files, and unused translation tooling
+
 
 ### Other
 - Fixed bootloop on some devices
