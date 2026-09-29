@@ -20,39 +20,35 @@ mkdir -p "$(dirname "$L")"
 touch "$L"
 {
     echo ""
-    echo "••••••• Cleanup Started •••••••"
+    echo "Cleanup Started"
 
     if [ ! -f "$F" ]; then
         log "File not found: $F"
-        echo "••••••• Cleanup Aborted •••••••"
+        echo "Cleanup Aborted"
         exit 0
     fi
 
-    log "Removing leftover files"
+    log "Removing watermark tokens from keybox"
 
-Z="$(cat "$F")"
+    # Strip the watermark words from every line. Read line-by-line so that
+    # commas inside XML attributes are never treated as separators.
+    while IFS= read -r LINE || [ -n "$LINE" ]; do
+        for WORD in ${X//,/ }; do
+            LINE="${LINE//$WORD/}"
+        done
+        printf "%s\n" "$LINE"
+    done < "$F" > "$T" || { log "Failed to rewrite keybox"; exit 1; }
 
-Y=""
-FIRST=1
-IFS=','
-
-for LINE in $(echo "$Z"); do
-    for WORD in $X; do
-        LINE="${LINE//$WORD/}"
-    done
-    if [ "$FIRST" -eq 1 ]; then
-        Y="$LINE"
-        FIRST=0
+    if [ -s "$T" ] && [ -s "$F" ] && cmp -s "$T" "$F"; then
+        rm -f "$T"
+        log "Keybox already clean"
+    elif [ -s "$T" ]; then
+        mv "$T" "$F"
+        log "Keybox cleaned"
     else
-        Y="$Y
-$LINE"
+        rm -f "$T"
+        log "Refusing to write empty keybox"
     fi
-done
-
-IFS="$OLD_IFS"
-
-printf "%s\n" "$Y" > "$T"
-mv "$T" "$F"
 
     log "Deleting known leftover files from my modules..."
     delete_if_exist /data/adb/integrity_box_verify
@@ -83,7 +79,7 @@ mv "$T" "$F"
 	delete_if_exist /data/local/tmp/keybox_runner.log
 	delete_if_exist /data/adb/modules/playintegrityfix/consent.sh
 	delete_if_exist /data/adb/modules/playintegrityfix/config.md
-    echo "••••••• Cleanup Ended •••••••"
+    echo "Cleanup Ended"
     echo " "
 } >> "$L" 2>&1
 

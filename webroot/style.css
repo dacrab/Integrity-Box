@@ -188,9 +188,7 @@ body {
 
 .status-indicator.enabled { background: rgba(0,153,255,0.2); color: var(--accent); }
 .status-indicator.disabled { background: rgba(220,80,80,0.25); color: #FF4C4C; }
-.status-indicator.neutral { background: rgba(120,120,120,0.25); color: #0ED000; }
 .status-indicator.play { background: rgba(160,90,220,0.25); color: #B36BFF; }
-.status-indicator.peela { background: rgba(255,165,0,0.25); color: #FFB500; }
 .status-indicator.gulambi { background: rgba(255,20,147,0.25); color: #FF2F92; }
 .status-indicator.grey { background: rgba(203,213,225,0.25); color: #CBD5E1; }
 .status-indicator.teal { background: rgba(45,212,191,0.25); color: #2DD4BF; }

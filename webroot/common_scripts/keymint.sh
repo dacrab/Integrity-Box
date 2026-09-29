@@ -25,16 +25,6 @@ SECURITY_PATCH=$(get_prop "SECURITY_PATCH")
 [ -z "$BRAND" ] && [ -z "$DEVICE" ] && [ -z "$PRODUCT" ] && [ -z "$MANUFACTURER" ] && [ -z "$SECURITY_PATCH" ] && exit 0
 
 # Build the new [device] section
-DEVICE_SECTION=""
-[ -n "$BRAND" ] && DEVICE_SECTION="${DEVICE_SECTION}brand = \"$BRAND\"
-"
-[ -n "$DEVICE" ] && DEVICE_SECTION="${DEVICE_SECTION}device = \"$DEVICE\"
-"
-[ -n "$PRODUCT" ] && DEVICE_SECTION="${DEVICE_SECTION}product = \"$PRODUCT\"
-"
-[ -n "$MANUFACTURURER" ] && DEVICE_SECTION="${DEVICE_SECTION}manufacturer = \"$MANUFACTURER\"
-"
-
 # Write new config
 awk -v brand="$BRAND" -v device="$DEVICE" -v product="$PRODUCT" \
     -v manufacturer="$MANUFACTURER" -v sec_patch="$SECURITY_PATCH" \
@@ -74,8 +64,16 @@ awk -v brand="$BRAND" -v device="$DEVICE" -v product="$PRODUCT" \
     }
     
     { print }
-' "$CONFIG_TOML" > "$TMP_CONFIG" 2>/dev/null
+' "$CONFIG_TOML" > "$TMP_CONFIG" || { echo "ERROR: awk failed, config left untouched" >&2; exit 1; }
 
-mv -f "$TMP_CONFIG" "$CONFIG_TOML" 2>/dev/null
+# Never publish an empty/partial config over a working one
+if [ ! -s "$TMP_CONFIG" ] || [ ! -s "$CONFIG_TOML" ]; then
+    echo "ERROR: Refusing to write empty config" >&2
+    rm -f "$TMP_CONFIG"
+    exit 1
+fi
+
+cp -f "$CONFIG_TOML" "$CONFIG_TOML.bak"
+mv -f "$TMP_CONFIG" "$CONFIG_TOML"
 
 exit 0

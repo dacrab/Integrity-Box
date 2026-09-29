@@ -1,5 +1,4 @@
 #!/system/bin/sh
-set -x
 
 # Log file & Logger
 LOGFILE="/data/local/tmp/uninstall.log"
@@ -60,7 +59,7 @@ revert_prop_if_modified() {
 }
 
 # Start logging
-log "•••••• Integrity-Box Uninstall Started ••••••"
+log "Integrity-Box Uninstall Started"
 
 # Define paths
 TRICKY_STORE="/data/adb/tricky_store"
@@ -91,13 +90,8 @@ revert_prop_if_modified "persist.sys.pihooks.disable.gms_props" "true" "false"
 revert_prop_if_modified "persist.sys.pihooks.disable" "1" "0"
 revert_prop_if_modified "persist.sys.kihooks.disable" "1" "0"
 
-# Unhide hidden files
-if [ -f "/data/adb/Vault/.hidefiles/last_action.sh" ]; then
-    sh "/data/adb/Vault/.hidefiles/last_action.sh"
-fi
-
 # Finish
-log "•••••• Integrity-Box Uninstall Completed ••••••"
+log "Integrity-Box Uninstall Completed"
 sync
 resetprop -p --delete "persist.sys.entryhooks_enabled"
 resetprop -p --delete "persist.sys.spoof.gms"

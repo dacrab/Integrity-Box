@@ -708,7 +708,7 @@ async function toggleOption(optionId){
   }
 
   showLoader(true, isCurrentlyActive ? "Disabling..." : "Enabling...");
-  popup(`${isCurrentlyActive ? '👎' : '👍'} ${options.find(o => o.id === optionId).name}...`, "info");
+  popup(`${options.find(o => o.id === optionId).name}...`, "info");
 
   requestAnimationFrame(() => {
     setTimeout(() => {

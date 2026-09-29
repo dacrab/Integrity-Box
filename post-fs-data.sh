@@ -57,10 +57,8 @@ for _f in \
     "$boot/hash.sh" \
     "$boot/lineage.sh" \
     "$boot/.box_cleanup.sh" \
-        "$placeholder/autopilot.sh" \
+    "$placeholder/autopilot.sh" \
     "$placeholder/target.sh" \
-    "$placeholder/gms.sh" \
-    "$placeholder/webui.sh" \
     "$placeholder/resetprop.sh" \
     "$placeholder/Report.sh" \
     "$placeholder/force_override.sh" \
@@ -79,9 +77,9 @@ done
 ##########################################
 
 # First check if Magisk directory exists
-if [ -d "/data/adb/magisk" ]; then
-    echo "Magisk detected."
+setup_resetprop
 
+if [ "$ROOT_SOL" = "magisk" ]; then
     if [ -d "$MODPATH/zygisk" ]; then
         # Remove Play Services and Play Store from Magisk DenyList when set to Enforce in normal mode
         if magisk --denylist status; then
@@ -96,9 +94,6 @@ if [ -d "/data/adb/magisk" ]; then
         magisk --denylist add com.google.android.gms com.google.android.gms.unstable
         magisk --denylist add com.android.vending
     fi
-
-else
-    echo "Skipped denylist (not Magisk)"
 fi
 
 # Conditional early sensitive properties
@@ -109,14 +104,13 @@ resetprop_if_diff ro.boot.realmebootstate green
 # OnePlus
 resetprop_if_diff ro.is_ever_orange 0
 
-# Microsoft
-for PROP in $(resetprop | grep -oE 'ro.*.build.tags'); do
-    resetprop_if_diff $PROP release-keys
+# Microsoft and other vendors ship test-keys / eng build types
+resetprop 2>/dev/null | sed -n 's/^\[\(ro\.[^]]*build\.tags\)\]:.*/\1/p' | while read -r PROP; do
+    resetprop_if_diff "$PROP" release-keys
 done
 
-# Other
-for PROP in $(resetprop | grep -oE 'ro.*.build.type'); do
-    resetprop_if_diff $PROP user
+resetprop 2>/dev/null | sed -n 's/^\[\(ro\.[^]]*build\.type\)\]:.*/\1/p' | while read -r PROP; do
+    resetprop_if_diff "$PROP" user
 done
 if ! $SKIPDELPROP; then
     delprop_if_exist ro.boot.verifiedbooterror

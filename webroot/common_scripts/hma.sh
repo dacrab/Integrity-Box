@@ -139,8 +139,9 @@ cp "$SRC_CONFIG" "$TARGET_CONFIG" || {
     exit 1
 }
 
+# The app runs unprivileged, so it must keep ownership of its own config.
+# Only relax the mode; chowning to system:system would stop HMA reading it.
 chmod 666 "$TARGET_CONFIG"
-chown system:system "$TARGET_CONFIG" 2>/dev/null
 
 if [ ! -f "$ANTISELINUX" ]; then
     ORIG_SELINUX="$(get_selinux_mode)"

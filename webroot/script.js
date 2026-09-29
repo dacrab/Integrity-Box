@@ -8,40 +8,19 @@ const modalOutput = document.getElementById("modal-output");
 const modalClose = document.getElementById("modal-close");
 
 const messageMap = {
-  "kill": { success: "DroidGuard has been restarted", type: "info" },
+  "status": { start: "Keybox, patch and TEE status", type: "info" },
+  "risky": { start: "Scan your installed apps for detection risks", type: "info" },
   "user": { start: "Blacklist Unnecessary Apps", type: "info" },
-  "stop": { success: "Switched to Blacklist Mode", type: "info" },
-  "start": { success: "Switched to Whitelist Mode", type: "info" },
-  "xml": { start: "Scanning xml files..", type: "info" },
   "pixel": { start: "Spoof your device to app", type: "info" },
-  "patch": { start: "Opening configuration..", type: "info" },
-  "aosp": { success: "Switched to AOSP Keybox", type: "info" },
-  "resetprop.sh": { success: "Done, Reopen detector to check", type: "info" },
-  "selinux": { success: "Spoofed to Enforcing", type: "info" },
   "piffork": { start: "All changes will be applied immediately", type: "info" },
   "propspoofer": { start: "These will be applied till reboot", type: "info" },
-  "nogms": { success: "Reboot to apply changes", type: "info" },
-  "yesgms": { start: "Reboot to apply changes", type: "info" },
-  "key.sh": { success: "Keybox updated", type: "info" },
-  "flags": { start: "These requires Reboot / Action", type: "info" },
+  "flags": { start: "These require a reboot or action", type: "info" },
   "profile": { start: "Select integrity profile", type: "info" },
   "ctrl": { start: "For those using ROM inbuilt spoofing", type: "info" },
-  "force_override.sh": { start: "Done", type: "info" },
-  "pif": { start: "You can update fingerprint without internet", type: "info" },
-  "vending": { start: "This will clear data of Play Services & Store", type: "info" },
-  "zygisknext": { start: "ZygiskNext settings", type: "info" },
-  "cache": { start: "This will delete temporary unnecessary files", type: "info" },
   "hide": { start: "This will hide basic sus paths", type: "info" },
-  "scanner": { start: " Click on Run Scan", success: "Detection Complete", type: "info" },
   "support": { start: "Become a Supporter", type: "info" },
   "report": { start: "Describe the issue", type: "info" },
   "assistant": { start: "Assistant", type: "info" },
-  "status": { start: "Informs you about keybox & fingerprint validity", type: "info" },
-  "hma.sh": { success: "Done", type: "info" },
-  "ulock": { success: "Done", type: "info" },
-  "faq": { start: "Coming Soon", type: "info" },
-  "nuke": { start: "Coming Soon", type: "info" },
-  "repair": { success: "These doesn't require reboot", type: "info" },
   "spoofing": { start: "These are for custom ROM users", type: "info" },
   "pilot": { start: "Updates keybox & fp automatically whether a new key is available", type: "info" },
   "downloader": { start: "Some useful stuff you may need", type: "info" },
@@ -74,7 +53,7 @@ function popup(msg, type="info") {
 }
 
 async function runShell(cmd) {
-  if (!cmd || typeof ksu?.exec !== "function") throw new Error("KSU API unavailable");
+  if (!cmd || typeof window.ksu?.exec !== "function") throw new Error("KSU API unavailable");
   return new Promise((res, rej) => {
     const cb = `cb_${Date.now()}_${Math.random()*10000|0}`;
     window[cb] = (code, stdout, stderr) => {
@@ -89,7 +68,7 @@ function enableFullScreen() {
   try {
     if (window.kernelsu?.fullScreen) return window.kernelsu.fullScreen(true);
     if (window.fullScreen) return window.fullScreen(true);
-    if (ksu?.fullScreen) return ksu.fullScreen(true);
+    if (window.ksu?.fullScreen) return window.ksu.fullScreen(true);
     document.documentElement.requestFullscreen?.().catch(()=>{});
   } catch {}
 }
@@ -259,7 +238,6 @@ async function fetchKeyboxStatus() {
 
 async function updateDashboard() {
   const statusItems = {
-    "status-playstore": "dumpsys package com.android.vending | grep versionName | head -n1 | awk -F'=' '{print $2}' | cut -d'-' -f1 | cut -d' ' -f1 | cut -d'.' -f1-3",
     "status-selinux": "getenforce || echo Unknown",
     "status-target": "[ -f /data/adb/tricky_store/target.txt ] && grep -cve '^$' /data/adb/tricky_store/target.txt || echo 0",
     "status-pixel": "[ -f /data/adb/modules/playintegrityfix/custom.pif.prop ] && awk -F= '/^MODEL=/{print $2}' /data/adb/modules/playintegrityfix/custom.pif.prop || echo None",
@@ -305,7 +283,6 @@ async function updateDashboard() {
           } else {
             expiryEl.className = "status-indicator enabled";
           }
-          expiryEl.textContent = `${diff} days`;
         }
       }
     } catch {
@@ -343,7 +320,6 @@ async function updateDashboard() {
 
     switch (id) {
 
-        case "status-playstore":
         case "status-profile":
           el.textContent = out;
           el.className = "status-indicator play";
@@ -362,25 +338,6 @@ async function updateDashboard() {
           el.className = `status-indicator ${count === 0 || count > 50 ? "disabled" : "enabled"}`;
           break;
           
-        case "status-integrity":
-          try {
-            const result = await fetchKeyboxStatus();
-            el.textContent = result.label;
-            if (result.status === 'STRONG') {
-              el.className = "status-indicator neutral";
-            } else if (result.status === 'DEVICE') {
-              el.className = "status-indicator peela";
-            } else if (result.status === 'BANNED') {
-              el.className = "status-indicator disabled";
-            } else {
-              el.className = "status-indicator disabled";
-            }
-          } catch {
-            el.textContent = "Offline";
-            el.className = "status-indicator disabled";
-          }
-          break;
-
         case "status-pixel":
         case "status-patch":
           el.textContent = out;
@@ -431,10 +388,12 @@ function attachButtonListeners() {
           return;
         }
 
-        if (["scanner","hash","user","flags","cache","nuke","piffork","propspoofer","pif","vending","downloader","keymint",
-             "support","report","profile","assistant","repair","pilot","faq","spoofing","status","tee","xml","pixel","hide","patch","ctrl"].includes(type)) {
+        if (["hash","user","flags","piffork","propspoofer","downloader",
+             "support","report","profile","assistant","pilot","spoofing","status","risky","pixel","hide","ctrl"].includes(type)) {
 
           const pathMap = {
+            status:"./Status/index.html",
+            risky:"./Risky/index.html",
             ctrl:"./Control/index.html",
             hash:"./BootHash/index.html",
             flags:"./Flags/index.html",
@@ -447,7 +406,6 @@ function attachButtonListeners() {
             hide:"./HideMyFiles/index.html",
             profile:"./Profile/index.html",
             assistant:"./Assistant/index.html",
-            repair:"./RepairMode/index.html",
             pilot:"./Pilot/index.html",
             spoofing:"./Spoofing/index.html",
             downloader:"./Downloader/index.html"

@@ -1,21 +1,6 @@
 #!/system/bin/sh
 
-# Universal resetprop detection
-RP=""
-for p in $(which resetprop 2>/dev/null) /data/adb/ksu/bin/resetprop /data/adb/ap/bin/resetprop /data/adb/magisk/resetprop /sbin/resetprop /system/xbin/resetprop /system/bin/resetprop; do
-    if [ -f "$p" ]; then
-        RP="$p"
-        break
-    fi
-done
-
-resetprop_set(){
-    $RP -n "$1" "$2"
-}
-
-resetprop_delete(){
-    $RP -d "$1"
-}
+command -v resetprop >/dev/null 2>&1 || { echo "resetprop not found"; exit 1; }
 
 OVERRIDE="/data/adb/modules/playintegrityfix/webroot/common_scripts/force_override.sh"
 
@@ -70,7 +55,7 @@ while IFS= read -r line || [ -n "$line" ]; do
             continue
             ;;
         *)
-            resetprop_set "$key" "$value"
+            resetprop -n "$key" "$value"
             actual_value=$(getprop "$key")
             if [ "$actual_value" = "$value" ]; then
                 echo "[OK] Overridden: $key=$value" >> "$LOG_FILE"
@@ -82,14 +67,13 @@ while IFS= read -r line || [ -n "$line" ]; do
 done < "$PROP_FILE"
 
 # Compact arenas to fix holes from other modules/sources
-$RP -c >/dev/null 2>&1 || true
+resetprop -c >/dev/null 2>&1 || true
 
 if [ -f "$OVERRIDE" ]; then
     sh "$OVERRIDE"
 fi
 
 echo "[INFO] Script completed at $(date)" >> "$LOG_FILE"
-echo "•••••••••••••••••••••=" >> "$LOG_FILE"
 echo " "
 echo " "
 exit 0

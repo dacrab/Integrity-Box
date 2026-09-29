@@ -865,18 +865,18 @@ n            animation: spin 0.8s linear infinite;
     <script>
         const CONFIG = {
             keyboxUrl: 'https://raw.githubusercontent.com/MeowDump/Integrity-Box/refs/heads/main/keybox/key-status',
-            fingerprintPath: '/data/adb/modules/playintegrityfix/pixel.txt',
+            fingerprintPath: '/data/adb/modules/playintegrityfix/custom.pif.prop',
             teePath: '/data/adb/tricky_store/tee_status',
             keyboxLocalPath: '/data/adb/tricky_store/keybox.xml'
         };
 
         const infoTexts = {
-            verdicts: `<div style="background: rgba(27, 30, 51, 0.8); backdrop-filter: blur(14px); border-radius: 16px; padding: 20px; margin: 16px 0; border: 1px solid rgba(255, 255, 255, 0.08);"><div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;"><span class="material-icons-round" style="color: #4da3ff; font-size: 20px;">info</span><span style="color: #9aa3ff; font-size: 13px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;">About Verdicts</span></div><div style="color: #e9ecff; font-size: 14px; line-height: 1.6;">These results represent <strong style="color: #4da3ff;">keybox validity</strong> indicating whether the current keybox meets integrity requirements or not. These indicators does not represents your device Play Integrity API request results</div><div style="display: flex; flex-direction: column; gap: 10px; margin-top: 14px;"><div style="display: flex; align-items: center; gap: 10px; background: rgba(77, 255, 136, 0.1); border-radius: 10px; padding: 12px 14px; border-left: 3px solid #4dff88;"><span class="material-icons-round" style="color: #4dff88; font-size: 18px;">verified</span><div><div style="color: #4dff88; font-size: 12px; font-weight: 700;">MEETS_STRONG_INTEGRITY</div><div style="color: #9aa3ff; font-size: 11px;">Keybox is valid</div></div></div><div style="display: flex; align-items: center; gap: 10px; background: rgba(255, 170, 77, 0.1); border-radius: 10px; padding: 12px 14px; border-left: 3px solid #ffaa4d;"><span class="material-icons-round" style="color: #ffaa4d; font-size: 18px;">shield</span><div><div style="color: #ffaa4d; font-size: 12px; font-weight: 700;">MEETS_DEVICE_INTEGRITY</div><div style="color: #9aa3ff; font-size: 11px;">Keybox is soft banned</div></div></div><div style="display: flex; align-items: center; gap: 10px; background: rgba(255, 77, 77, 0.1); border-radius: 10px; padding: 12px 14px; border-left: 3px solid #ff4d4d;"><span class="material-icons-round" style="color: #ff4d4d; font-size: 18px;">error</span><div><div style="color: #ff4d4d; font-size: 12px; font-weight: 700;">BASIC / NO_INTEGRITY</div><div style="color: #9aa3ff; font-size: 11px;">Keybox is revoked</div></div></div></div></div>`,
+            verdicts: `<div style="background: rgba(27, 30, 51, 0.8); backdrop-filter: blur(14px); border-radius: 16px; padding: 20px; margin: 16px 0; border: 1px solid rgba(255, 255, 255, 0.08);"><div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;"><span class="material-icons-round" style="color: #4da3ff; font-size: 20px;">info</span><span style="color: #9aa3ff; font-size: 13px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;">About Verdicts</span></div><div style="color: #e9ecff; font-size: 14px; line-height: 1.6;">These results represent <strong style="color: #4da3ff;">keybox validity</strong> indicating whether the current keybox meets integrity requirements or not. These indicators do not represent your device's Play Integrity API results</div><div style="display: flex; flex-direction: column; gap: 10px; margin-top: 14px;"><div style="display: flex; align-items: center; gap: 10px; background: rgba(77, 255, 136, 0.1); border-radius: 10px; padding: 12px 14px; border-left: 3px solid #4dff88;"><span class="material-icons-round" style="color: #4dff88; font-size: 18px;">verified</span><div><div style="color: #4dff88; font-size: 12px; font-weight: 700;">MEETS_STRONG_INTEGRITY</div><div style="color: #9aa3ff; font-size: 11px;">Keybox is valid</div></div></div><div style="display: flex; align-items: center; gap: 10px; background: rgba(255, 170, 77, 0.1); border-radius: 10px; padding: 12px 14px; border-left: 3px solid #ffaa4d;"><span class="material-icons-round" style="color: #ffaa4d; font-size: 18px;">shield</span><div><div style="color: #ffaa4d; font-size: 12px; font-weight: 700;">MEETS_DEVICE_INTEGRITY</div><div style="color: #9aa3ff; font-size: 11px;">Keybox is soft banned</div></div></div><div style="display: flex; align-items: center; gap: 10px; background: rgba(255, 77, 77, 0.1); border-radius: 10px; padding: 12px 14px; border-left: 3px solid #ff4d4d;"><span class="material-icons-round" style="color: #ff4d4d; font-size: 18px;">error</span><div><div style="color: #ff4d4d; font-size: 12px; font-weight: 700;">BASIC / NO_INTEGRITY</div><div style="color: #9aa3ff; font-size: 11px;">Keybox is revoked</div></div></div></div></div>`,
     
             fingerprint: `<strong>Device Fingerprint</strong><br><br>
                 Spoofs your device identity to match a certified device profile.<br><br>
                 <strong>Validity Period</strong> - Estimated expiry calculated from canary release dates. Once expired, integrity checks will fail.<br><br>
-                Config: <code>pixel.txt</code>`
+                Config: <code>custom.pif.prop</code>`
         };
 
         const DOM = {};
@@ -1128,7 +1128,7 @@ n            animation: spin 0.8s linear infinite;
                 panel.className = 'tee-card broken';
                 title.textContent = 'TEE Broken';
                 desc.textContent = 'Not a problem';
-                badge.textContent = 'its ok bro';
+                badge.textContent = 'OK';
             } else {
                 panel.className = 'tee-card healthy';
                 title.textContent = 'TEE Healthy';

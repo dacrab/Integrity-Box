@@ -102,7 +102,7 @@ if [ -f "$PIF_FILE" ]; then
         first=1
       }
 
-      $1=="=verboseLogs" ||
+      $1=="verboseLogs" ||
       $1=="spoofApps" ||
       $1=="spoofBuild" ||
       $1=="spoofProps" ||

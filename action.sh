@@ -7,12 +7,10 @@ MODPATH="${0%/*}"
 BOX="/data/adb/Box-Brain"
 LOGDIR="$BOX/Integrity-Box-Logs"
 
-LOGFILEZ="$LOGDIR/PIF.log"
 CPP="$LOGDIR/spoofing.log"
 PATCH_LOG="$LOGDIR/patch.log"
 LOG="$LOGDIR/root.log"
 LOGFILE="$LOGDIR/gapps.log"
-LOGZ="$LOGDIR/integrity_downloader.log"
 
 SCRIPT_DIR="$MODPATH/webroot/common_scripts"
 UPDATE="$SCRIPT_DIR/key.sh"
@@ -20,17 +18,13 @@ UPDATE="$SCRIPT_DIR/key.sh"
 PROP="$MODPATH/module.prop"
 BAK="$PROP.bak"
 
-URL="https://raw.githubusercontent.com/MeowDump/Integrity-Box/refs/heads/main/keybox/key-status"
-INSTALLATION="/data/adb/modules_update/playintegrityfix/webroot/common_scripts/key.sh"
-
 FLAG="$BOX/advanced"
 PATCH_FLAG="$BOX/patch"
 
-P="$MODPATH/custom.pif.prop"
+PIF_PROP="$MODPATH/custom.pif.prop"
 SKIP_FILE="$BOX/skip"
 SPOOF_APPS="$BOX/per-app-spoofing"
 
-PATCH_DATE="2026-09-05"
 PROP_MAIN="ro.build.version.security_patch"
 
 TARGET_DIR="/data/adb/tricky_store"
@@ -39,12 +33,9 @@ FILE_PATH="$TARGET_DIR/security_patch.txt"
 DIR="/sdcard/Download"
 OUTJSON="/sdcard/meow.json"
 
-WIDTH=55
 BRAND_PROP=$(getprop ro.product.system.brand)
 
-AUTOPIF_OK=0
 MIGRATE_OK=0
-INPUT_PROP=""
 
 mkdir -p "$BOX" "$LOGDIR"
 ensure_exec_permissions
@@ -78,9 +69,9 @@ fi
   echo "[*] Starting cleanup..."; 
   if getprop | grep -q "^\[dalvik.vm.dex2oat-flags\]"; then 
     echo "[*] Removing dalvik.vm.dex2oat-flags..."; 
-    resetprop -p dalvik.vm.dex2oat-flags && echo "[✓] Property removed." || echo "[!] Failed to remove property."; 
+    resetprop -p dalvik.vm.dex2oat-flags && echo "[OK] Property removed." || echo "[FAIL] Failed to remove property."; 
   fi; 
-  rm -f $BOX/lsposed && echo "[✓] Cleanup complete."; 
+  rm -f $BOX/lsposed && echo "[OK] Cleanup complete."; 
   echo "[*] Done. Exiting."; 
   exit 0; 
 }
@@ -139,10 +130,6 @@ if [ -f "$BOX/gapps" ]; then
   exit 0
 fi
 
-# Ensure log directory/file exists
-mkdir -p "$(dirname "$CPP")" 2>/dev/null || true
-touch "$CPP" 2>/dev/null || true
-
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >>"$CPP"; }
 
 reset_tricky_store
@@ -154,58 +141,50 @@ if [ -f "$BOX/keymint" ]; then
     "$SCRIPT_DIR/keymint.sh"
 fi
 
-# RUN STEPS
-# Ensure log file exists
-mkdir -p "$(dirname "$CPP")" 2>/dev/null || true
-touch "$CPP" 2>/dev/null || true
-
-# Mode
+# Mode (descriptive only; the flags themselves are read by the called scripts)
 ARGDESC=""
-ARGS=""
 
-[ -f "$BOX/use_qpr2" ]       && ARGS="$ARGS -q" && ARGDESC="$ARGDESC QPR2 "
-[ -f "$BOX/use_advanced" ]   && ARGS="$ARGS -a" && ARGDESC="$ARGDESC ADVANCED "
-[ -f "$BOX/use_strong" ]     && ARGS="$ARGS -s" && ARGDESC="$ARGDESC STRONG "
-[ -f "$BOX/use_match" ]      && ARGS="$ARGS -m" && ARGDESC="$ARGDESC MATCH "
-[ -f "$BOX/skip_json" ]      && ARGS="$ARGS -n" && ARGDESC="$ARGDESC SKIP_JSON "
-[ -f "$BOX/skip_patch" ]     && ARGS="$ARGS -x" && ARGDESC="$ARGDESC SKIP_PATCH " && SKIP_PATCH=1
-[ -f "$BOX/skip_keybox" ]    && ARGS="$ARGS -k" && ARGDESC="$ARGDESC SKIP_KEYBOX " && SKIP_KEYBOX=1
-[ -f "$BOX/verbose_mode" ]   && ARGS="$ARGS -v" && ARGDESC="$ARGDESC VERBOSE "
-[ -f "$BOX/force_spoof_off" ]&& ARGS="$ARGS -S" && ARGDESC="$ARGDESC NO_SPOOF "
+[ -f "$BOX/use_qpr2" ]        && ARGDESC="$ARGDESC QPR2 "
+[ -f "$BOX/use_advanced" ]    && ARGDESC="$ARGDESC ADVANCED "
+[ -f "$BOX/use_strong" ]      && ARGDESC="$ARGDESC STRONG "
+[ -f "$BOX/use_match" ]       && ARGDESC="$ARGDESC MATCH "
+[ -f "$BOX/skip_json" ]       && ARGDESC="$ARGDESC SKIP_JSON "
+[ -f "$BOX/skip_patch" ]      && ARGDESC="$ARGDESC SKIP_PATCH "
+[ -f "$BOX/skip_keybox" ]     && ARGDESC="$ARGDESC SKIP_KEYBOX "
+[ -f "$BOX/verbose_mode" ]    && ARGDESC="$ARGDESC VERBOSE "
+[ -f "$BOX/force_spoof_off" ] && ARGDESC="$ARGDESC NO_SPOOF "
 
-for i in {1..9}; do
-    [ -f "$BOX/top_$i" ]   && ARGS="$ARGS -t $i" && ARGDESC="$ARGDESC top=$i" && break
+i=1
+while [ "$i" -le 9 ]; do
+    [ -f "$BOX/top_$i" ] && ARGDESC="$ARGDESC top=$i" && break
+    i=$((i + 1))
 done
 
-for i in {1..9}; do
-    [ -f "$BOX/depth_$i" ] && ARGS="$ARGS -d $i" && ARGDESC="$ARGDESC depth=$i" && break
+i=1
+while [ "$i" -le 9 ]; do
+    [ -f "$BOX/depth_$i" ] && ARGDESC="$ARGDESC depth=$i" && break
+    i=$((i + 1))
 done
 
 [ -n "$ARGDESC" ] && log_step "MODE" "$ARGDESC"
 
 # Keybox Handling
 for f in keybox keybox2; do
-    FLAG="$BOX/$f"
+    KEY_FLAG="$BOX/$f"
     SRC="$TARGET_DIR/$f.xml"
 
     [ "$f" = "keybox2" ] && DEST="/sdcard/aosp.xml" || DEST="/sdcard/$f.xml"
 
-    su -c "[ -e \"$FLAG\" ] && [ -r \"$SRC\" ] && cat \"$SRC\" > \"$DEST\" && sync" >/dev/null 2>&1
+    su -c "[ -e \"$KEY_FLAG\" ] && [ -r \"$SRC\" ] && cat \"$SRC\" > \"$DEST\" && sync" >/dev/null 2>&1
 done
 
-# Spoofing
-if [ -f "$FLAG" ] && [ -f "$MODPATH/osm0sis.sh" ]; then
-    sh "$MODPATH/osm0sis.sh" && log_step "UPDATED" "Advanced Fingerprint" || log_step "FAILED" "osm0sis.sh"
+# Fingerprint
+if [ -f "$MODPATH/osm0sis.sh" ]; then
+    echo " "
+    sh "$MODPATH/osm0sis.sh" && log_step "UPDATED" "Fingerprint" || log_step "FAILED" "osm0sis.sh"
 else
-    FP_SCRIPT="$MODPATH/osm0sis.sh"
-    [ ! -f "$FP_SCRIPT" ] && FP_SCRIPT="$MODPATH/osm0sis.sh"
-    if [ -n "$FP_SCRIPT" ]; then
-        echo " "
-        sh "$FP_SCRIPT" && log_step "UPDATED" "Pixel Canary Imprint" || log_step "FAILED" "Fingerprint update"
-    else
-        echo " "
-        log_step "WARNING" "PLEASE RE-FLASH THE MODULE"
-    fi
+    echo " "
+    log_step "WARNING" "Missing osm0sis.sh, re-flash the module"
 fi
 
 # Migrate
@@ -234,7 +213,7 @@ elif [ "$HAS_PROP" -eq 1 ]; then
 fi
 
 if [ -f "$BOX/run_migrate" ]; then
-    if sh "$MODPATH/migrate.sh" $MARGS "$INPUT_PROP" >>"$CPP" 2>&1; then
+    if sh "$MODPATH/migrate.sh" $MARGS >>"$CPP" 2>&1; then
         MIGRATE_OK=1
         log_step "MIGRATE" "Pixel RAW Fingerprint"
     else
@@ -246,14 +225,14 @@ fi
 
 # Expiry Handling
 if [ "$MIGRATE_OK" -eq 1 ] && [ -f "$BOX/remove_expiry" ]; then
-    sed -i '/Released On:/d;/Estimated Expiry:/d' "$P"
-#    log_step "REMOVED" "Expiry comment removed"
-#else
-#    log_step "SKIPPED" "Expiry handling"
+    sed -i '/Released On:/d;/Estimated Expiry:/d' "$PIF_PROP"
+    log_step "REMOVED" "Expiry comment removed"
+else
+    log_step "SKIPPED" "Expiry handling"
 fi
 
 # JSON Export
-if [ "$MIGRATE_OK" -eq 1 ] && [ -f "$BOX/json" ] && [ ! -f "$BOX/skip_json" ] && [ -f "$P" ]; then
+if [ "$MIGRATE_OK" -eq 1 ] && [ -f "$BOX/json" ] && [ ! -f "$BOX/skip_json" ] && [ -f "$PIF_PROP" ]; then
     {
         echo "{"
         echo '  "BuildFields": {'
@@ -274,7 +253,7 @@ if [ "$MIGRATE_OK" -eq 1 ] && [ -f "$BOX/json" ] && [ ! -f "$BOX/skip_json" ] &&
             [ "$first" -eq 0 ] && echo ","
             printf '    "%s": "%s"' "$key" "$val"
             first=0
-        done < "$P"
+        done < "$PIF_PROP"
         echo
         echo "  }"
         echo "}"
@@ -285,120 +264,8 @@ else
 fi
 
 
-# Blacklist
-mkdir -p "$TARGET_DIR" 2>/dev/null
-TARGET="$TARGET_DIR/target.txt"
-BACKUP="$TARGET.bak"
-TMP="${TARGET}.new.$$"
-success=0
-made_backup=0
-orig_selinux="$(getenforce 2>/dev/null || echo Permissive)"
-
-if [ ! -f "$SKIP_FILE" ] && [ "$orig_selinux" = "Enforcing" ]; then
-    setenforce 0
-fi
-
-[ -f "$TARGET" ] && mv -f "$TARGET" "$BACKUP" && made_backup=1 && log_step "PERFORM" "Targets Backup"
-
-teeBroken="false"
-TEE_STATUS="$TARGET_DIR/tee_status"
-[ -f "$TEE_STATUS" ] && [ "$(grep -E '^teeBroken=' "$TEE_STATUS" | cut -d '=' -f2)" = "true" ] && teeBroken="true"
-
-for pkg in com.android.vending com.google.android.gms com.google.android.gsf io.github.qwq233.keyattestation io.github.vvb2060.keyattestation com.google.android.apps.walletnfcrel com.google.android.apps.messaging; do
-    echo "$pkg" >> "$TMP"
-done
-
-cmd package list packages -3 2>/dev/null | cut -d ":" -f2 | while read -r pkg; do
-    [ -z "$pkg" ] && continue
-    grep -Fxq "$pkg" "$TMP" || echo "$pkg" >> "$TMP"
-done
-
-sed -i 's/^[[:space:]]*//;s/[[:space:]]*$//' "$TMP"
-sort -u "$TMP" -o "$TMP"
-
-BLACKLIST="$BOX/blacklist.txt"
-if [ -s "$BLACKLIST" ]; then
-    sed -i 's/^[[:space:]]*//;s/[[:space:]]*$//' "$BLACKLIST"
-    grep -Fvxf "$BLACKLIST" "$TMP" > "${TMP}.filtered" || true
-    mv -f "${TMP}.filtered" "$TMP"
-    log_step "MIGRATE" "Blacklisted Targets"
-else
-    log_step "SKIPPED" "Blacklist not configured"
-fi
-
-[ "$teeBroken" = "true" ] && sed -i 's/$/!/' "$TMP" && log_step "SUPPORT" "TEE Broken Device"
-
-mv -f "$TMP" "$TARGET" && success=1 && log_step "UPDATED" "Target Packages config"
-
-if [ ! -f "$SKIP_FILE" ] && [ "$orig_selinux" = "Enforcing" ]; then
-    setenforce 1
-fi
-
-# OMK Injector TOML Support
-OMK_DIR="/data/misc/keystore/omk"
-INJECTOR_TOML="$OMK_DIR/injector.toml"
-TMP_TOML="${INJECTOR_TOML}.tmp.$$"
-SCOOP_TMP="/data/local/tmp/.omk_scoop_$$"
-
-if [ -d "$OMK_DIR" ]; then
-    # Build scoop array from target.txt
-    {
-        echo "scoop = ["
-        while IFS= read -r pkg || [ -n "$pkg" ]; do
-            [ -z "$pkg" ] && continue
-            pkg_clean="${pkg%!}"
-            echo "  \"$pkg_clean\","
-        done < "$TARGET"
-        echo "]"
-    } > "$SCOOP_TMP" 2>/dev/null
-
-    if [ -f "$INJECTOR_TOML" ]; then
-        # Extract everything before scoop section
-        sed -n '1,/^scoop[[:space:]]*=[[:space:]]*\[/p' "$INJECTOR_TOML" | sed '$d' > "$TMP_TOML" 2>/dev/null
-        
-        # Append our new scoop section
-        cat "$SCOOP_TMP" >> "$TMP_TOML" 2>/dev/null
-        
-        # Extract everything after scoop section
-        sed -n '/^[[:space:]]*\]/,$p' "$INJECTOR_TOML" | sed '1d' >> "$TMP_TOML" 2>/dev/null
-        
-        mv -f "$TMP_TOML" "$INJECTOR_TOML" 2>/dev/null
-        rm -f "$SCOOP_TMP" 2>/dev/null
-        log_step "SCOOPED" "Targets in injector.toml"
-    else
-        # No existing file, create fresh
-        {
-            echo '# Only packages listed in `scoop` are intercepted.'
-            echo ''
-            cat "$SCOOP_TMP"
-            echo ''
-            echo '[main]'
-            echo 'enabled = true'
-            echo 'log_level = "debug"'
-            echo ''
-            echo '[filter]'
-            echo 'enabled = true'
-            echo 'deny_packages = []'
-            echo 'block_android_package = true'
-            echo 'allow_unknown_package = false'
-            echo ''
-            echo '# Do not edit if you have no idea about the things below'
-            echo '[intercept]'
-            echo 'get_security_level = true'
-            echo 'get_key_entry = true'
-            echo 'update_subcomponent = true'
-            echo 'list_entries = true'
-            echo 'delete_key = true'
-            echo 'grant = true'
-            echo 'ungrant = true'
-            echo 'get_number_of_entries = true'
-            echo 'list_entries_batched = true'
-            echo 'get_supplementary_attestation_info = true'
-        } > "$INJECTOR_TOML" 2>/dev/null
-        rm -f "$SCOOP_TMP" 2>/dev/null
-        log_step "CREATED" "Missing injector.toml for OMK"
-    fi
-fi
+# Targets
+rebuild_targets "com.android.vending com.google.android.gms com.google.android.gsf io.github.qwq233.keyattestation io.github.vvb2060.keyattestation com.google.android.apps.walletnfcrel com.google.android.apps.messaging"
 
 # Write security_patch.txt based on patch flag
 if [ -f "$PATCH_FLAG" ]; then
@@ -452,58 +319,52 @@ if [ ! -e "$BOX/teesim" ] && [ -f "$SCRIPT_DIR/teesim.sh" ]; then
 fi
 
 # Restore per-App-Spoofing value
-if [ -f "$P" ]; then
+if [ -f "$PIF_PROP" ]; then
     if [ -f "$SPOOF_APPS" ]; then
-        sed -i 's/^spoofApps=.*/spoofApps=1/' "$P"
+        sed -i 's/^spoofApps=.*/spoofApps=1/' "$PIF_PROP"
     else
-        sed -i 's/^spoofApps=.*/spoofApps=0/' "$P"
+        sed -i 's/^spoofApps=.*/spoofApps=0/' "$PIF_PROP"
     fi
 fi
 
 # Update module description
-{
-  for p in /data/adb/modules/busybox-ndk/system/*/busybox \
-           /data/adb/ksu/bin/busybox \
-           /data/adb/ap/bin/busybox \
-           /data/adb/magisk/busybox \
-           /system/bin/busybox \
-           /system/xbin/busybox; do
-    [ -x "$p" ] && bb="$p" && break
-  done
-  [ -z "$bb" ] && return 0
+update_description() {
+    bb="$(P)"
+    [ -z "$bb" ] && return 0
 
-  # Model
-  MODEL=""
-  [ -f "$P" ] && MODEL=$($bb sed -n 's/^MODEL=//p' "$P" | $bb head -n1)
-  [ -z "$MODEL" ] && MODEL="Unknown"
+    # Model
+    MODEL=""
+    [ -f "$PIF_PROP" ] && MODEL=$($bb sed -n 's/^MODEL=//p' "$PIF_PROP" | $bb head -n1)
+    [ -z "$MODEL" ] && MODEL="Unknown"
 
-  # Targets
-  T=0
-  [ -f "/data/adb/tricky_store/target.txt" ] && T=$($bb grep -c '.' "/data/adb/tricky_store/target.txt" 2>/dev/null | $bb tr -d ' ')
-  [ -z "$T" ] && T=0
+    # Targets
+    T=0
+    [ -f "$TARGET_DIR/target.txt" ] && T=$($bb grep -c '.' "$TARGET_DIR/target.txt" 2>/dev/null | $bb tr -d ' ')
+    [ -z "$T" ] && T=0
 
-  # Spoofed apps
-  S=0
-  SPOOF_APPS_VAL=""
-  [ -f "$P" ] && SPOOF_APPS_VAL=$($bb sed -n 's/^spoofApps=//p' "$P" | $bb head -n1)
+    # Spoofed apps
+    S=0
+    SPOOF_APPS_VAL=""
+    [ -f "$PIF_PROP" ] && SPOOF_APPS_VAL=$($bb sed -n 's/^spoofApps=//p' "$PIF_PROP" | $bb head -n1)
 
-  if [ "$SPOOF_APPS_VAL" = "1" ]; then
-    [ -f "/data/adb/modules/playintegrityfix/apps.txt" ] && S=$($bb grep -c '.' "/data/adb/modules/playintegrityfix/apps.txt" 2>/dev/null | $bb tr -d ' ')
-    [ -z "$S" ] && S=0
-  fi
+    if [ "$SPOOF_APPS_VAL" = "1" ]; then
+        [ -f "/data/adb/modules/playintegrityfix/apps.txt" ] && S=$($bb grep -c '.' "/data/adb/modules/playintegrityfix/apps.txt" 2>/dev/null | $bb tr -d ' ')
+        [ -z "$S" ] && S=0
+    fi
 
-  # Blocked
-  B=0
-  [ -f "$BOX/blacklist.txt" ] && B=$($bb grep -c '.' "$BOX/blacklist.txt" 2>/dev/null | $bb tr -d ' ')
-  [ -z "$B" ] && B=0
+    # Blocked
+    B=0
+    [ -f "$BOX/blacklist.txt" ] && B=$($bb grep -c '.' "$BOX/blacklist.txt" 2>/dev/null | $bb tr -d ' ')
+    [ -z "$B" ] && B=0
 
-  # Build & write
-  DESC="$MODEL    Targets: $T    Spoofed: $S    Blocked: $B"
+    DESC="$MODEL    Targets: $T    Spoofed: $S    Blocked: $B"
 
-  [ ! -f "$BAK" ] && $bb cp "$PROP" "$BAK"
-  $bb sed -i '/^description=/d' "$PROP"
-  echo "description=$DESC" >> "$PROP"
-} || true
+    [ ! -f "$BAK" ] && $bb cp "$PROP" "$BAK"
+    $bb sed -i '/^description=/d' "$PROP"
+    echo "description=$DESC" >> "$PROP"
+}
+
+update_description || true
 
 echo "    -- ACTION COMPLETED SUCCESSFULLY --"
 handle_delay

@@ -175,12 +175,7 @@ else
    log "nuke-los-boot flag not found, skipping force_override.sh"
 fi
 
-resetprop --compact >/dev/null 2>&1 || true
-
-# Stop daemon if needed 
-if [ -f "$BOX/rukja" ]; then
-    exit 0
-fi
+run_compact
 
 # Daemon watchdog
 if [ -f "$BOX/autopilot" ]; then

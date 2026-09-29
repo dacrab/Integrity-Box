@@ -1,8 +1,10 @@
+# shellcheck shell=sh
 RECORD="/data/adb/Box-Brain/Integrity-Box-Logs"
-OUT="/storage/emulated/0/Download/IntegrityModules"
 BOX="/data/adb/Box-Brain"
-LOGZ="/data/adb/Box-Brain/Integrity-Box-Logs/integrity_downloader.log"
 LOG_FILE="/data/adb/Box-Brain/Integrity-Box-Logs/action.log"
+
+# Single source of truth for the security patch date (TrickyStore + resetprop)
+PATCH_DATE="2026-09-05"
 
 # Property Backend Setup
 RESETPROP="resetprop"
@@ -43,11 +45,6 @@ check_compact_support() {
     resetprop --help 2>&1 | grep -q "compact"
 }
 
-# stub for boot-time
-if [ "$(getprop sys.boot_completed)" != "1" ]; then
-    ui_print() { return; }
-fi
-
 setup_resetprop() {
     case "$ROOT_SOL" in
         magisk)
@@ -77,19 +74,11 @@ setup_resetprop() {
 }
 
 safemode_flags() {
-	
     local dir="/data/adb/Box-Brain"
-	
     [ -f "$dir/safemode" ] || return 0
-	
-
-	
-    for f in spoof-los-boot nuke-los-boot spoof-custom-rom-boot NoLineageProp nodebug build tag encrypt hidehook; do
-	
+    for f in spoof-los-boot nuke-los-boot spoof-custom-rom-boot spoof-selinux-boot nuke-sus-boot NoLineageProp nodebug build tag encrypt hidehook twrp skip; do
         [ -f "$dir/$f" ] && rm -f "$dir/$f"
-	
     done
-	
 }
 
 set_perm_if_needed() {
@@ -185,12 +174,8 @@ wait_for_network() {
   return 1
 }
 
-lineage() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') $*" | tee -a "$RECORD/lineage.log"
-}
-
 chup() {
-echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$RECORD/pixel.log"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$RECORD/pixel.log"
 }
 
 set_simpleprop() {
@@ -216,7 +201,7 @@ log_step() {
   
   timestamp=$(date '+%Y-%m-%d %H:%M:%S')
   
-  printf -- " ✦ %-10s %s\n" "$status" "$task"
+  printf -- "%-10s %s\n" "$status" "$task"
   printf "[%s] %-10s %s\n" "$timestamp" "$status" "$task" >> "$LOG_FILE"
 }
 
@@ -282,6 +267,135 @@ delete_if_exist() {
     fi
 }
 
+# Rebuild the TrickyStore target list and sync the OMK injector config.
+# Shared by the action runner and the WebUI target runner (were duplicated).
+# $1 = space-separated seed packages, always included.
+rebuild_targets() {
+    _seed="$1"
+    _target_dir="/data/adb/tricky_store"
+    _target="$_target_dir/target.txt"
+    _tmp="${_target}.new.$$"
+    _skip="/data/adb/Box-Brain/skip"
+    _blacklist="/data/adb/Box-Brain/blacklist.txt"
+    _orig_selinux="$(getenforce 2>/dev/null || echo Permissive)"
+
+    mkdir -p "$_target_dir" 2>/dev/null
+
+    # TrickyStore cannot read target.txt while SELinux is enforcing, but never
+    # leave the device permissive if this function dies partway through.
+    _restore_enforcing() {
+        [ "$_orig_selinux" = "Enforcing" ] && [ ! -f "$_skip" ] && setenforce 1
+        return 0
+    }
+    if [ ! -f "$_skip" ] && [ "$_orig_selinux" = "Enforcing" ]; then
+        setenforce 0
+        trap _restore_enforcing EXIT INT TERM
+    fi
+
+    [ -f "$_target" ] && mv -f "$_target" "${_target}.bak" && log_step "BACKUP" "Previous target.txt"
+
+    _tee_broken="false"
+    [ -f "$_target_dir/tee_status" ] && [ "$(grep -E '^teeBroken=' "$_target_dir/tee_status" | cut -d '=' -f2)" = "true" ] && _tee_broken="true"
+
+    for _pkg in $_seed; do
+        echo "$_pkg" >> "$_tmp"
+    done
+
+    cmd package list packages -3 2>/dev/null | cut -d ":" -f2 | while read -r _pkg; do
+        [ -z "$_pkg" ] && continue
+        grep -Fxq "$_pkg" "$_tmp" || echo "$_pkg" >> "$_tmp"
+    done
+
+    sed -i 's/^[[:space:]]*//;s/[[:space:]]*$//' "$_tmp"
+    sort -u "$_tmp" -o "$_tmp"
+
+    if [ -s "$_blacklist" ]; then
+        sed -i 's/^[[:space:]]*//;s/[[:space:]]*$//' "$_blacklist"
+        # grep exits 1 when every line is filtered; keep the file if it still has content
+        if grep -Fvxf "$_blacklist" "$_tmp" > "${_tmp}.filtered" || [ -s "${_tmp}.filtered" ]; then
+            mv -f "${_tmp}.filtered" "$_tmp"
+            log_step "FILTERED" "Blacklisted targets removed"
+        else
+            rm -f "${_tmp}.filtered"
+            log_step "SKIPPED" "All targets blacklisted, keeping list"
+        fi
+    else
+        log_step "SKIPPED" "Blacklist not configured"
+    fi
+
+    [ "$_tee_broken" = "true" ] && sed -i 's/$/!/' "$_tmp" && log_step "NOTED" "TEE-broken device suffix applied"
+
+    mv -f "$_tmp" "$_target" && log_step "UPDATED" "Target package list"
+
+    trap - EXIT INT TERM 2>/dev/null
+    if [ ! -f "$_skip" ] && [ "$_orig_selinux" = "Enforcing" ]; then
+        setenforce 1
+    fi
+
+    sync_omk_injector "$_target"
+}
+
+# Sync TrickyStore target.txt into the OMK injector.toml scoop list.
+# $1 = path to target.txt
+sync_omk_injector() {
+    _target="$1"
+    _omk_dir="/data/misc/keystore/omk"
+    _toml="$_omk_dir/injector.toml"
+    _tmp_toml="${_toml}.tmp.$$"
+    _scoop="/data/local/tmp/.omk_scoop_$$"
+
+    [ -d "$_omk_dir" ] || return 0
+
+    {
+        echo "scoop = ["
+        while IFS= read -r _pkg || [ -n "$_pkg" ]; do
+            [ -z "$_pkg" ] && continue
+            echo "  \"${_pkg%!}\","
+        done < "$_target"
+        echo "]"
+    } > "$_scoop" 2>/dev/null
+
+    if [ -f "$_toml" ]; then
+        sed -n '1,/^scoop[[:space:]]*=[[:space:]]*\[/p' "$_toml" | sed '$d' > "$_tmp_toml" 2>/dev/null
+        cat "$_scoop" >> "$_tmp_toml" 2>/dev/null
+        sed -n '/^[[:space:]]*\]/,$p' "$_toml" | sed '1d' >> "$_tmp_toml" 2>/dev/null
+        mv -f "$_tmp_toml" "$_toml" 2>/dev/null
+        rm -f "$_scoop" 2>/dev/null
+        log_step "SYNCED" "Targets in injector.toml"
+    else
+        {
+            echo '# Only packages listed in `scoop` are intercepted.'
+            echo ''
+            cat "$_scoop"
+            echo ''
+            echo '[main]'
+            echo 'enabled = true'
+            echo 'log_level = "debug"'
+            echo ''
+            echo '[filter]'
+            echo 'enabled = true'
+            echo 'deny_packages = []'
+            echo 'block_android_package = true'
+            echo 'allow_unknown_package = false'
+            echo ''
+            echo '# Do not edit if you have no idea about the things below'
+            echo '[intercept]'
+            echo 'get_security_level = true'
+            echo 'get_key_entry = true'
+            echo 'update_subcomponent = true'
+            echo 'list_entries = true'
+            echo 'delete_key = true'
+            echo 'grant = true'
+            echo 'ungrant = true'
+            echo 'get_number_of_entries = true'
+            echo 'list_entries_batched = true'
+            echo 'get_supplementary_attestation_info = true'
+        } > "$_toml" 2>/dev/null
+        rm -f "$_scoop" 2>/dev/null
+        log_step "CREATED" "Missing injector.toml for OMK"
+    fi
+}
+
 P() {
   for Q in /data/adb/modules/busybox-ndk/system/*/busybox \
            /data/adb/ksu/bin/busybox \
@@ -290,28 +404,6 @@ P() {
     [ -x "$Q" ] && echo "$Q" && return
   done
 }
-
-Z() {
-  b=0; s=0
-  while IFS= read -r -n1 c; do
-    case "$c" in
-      [A-Z]) v=$(printf '%d' "'$c"); v=$((v - 65));;
-      [a-z]) v=$(printf '%d' "'$c"); v=$((v - 71));;
-      [0-9]) v=$(printf '%d' "'$c"); v=$((v + 4));;
-      '+') v=62;;
-      '/') v=63;;
-      '=') break;;
-      *) continue;;
-    esac
-    b=$((b << 6 | v)); s=$((s + 6))
-    if [ "$s" -ge 8 ]; then
-      s=$((s - 8)); o=$(((b >> s) & 0xFF))
-      printf \\$(printf '%03o' "$o")
-    fi
-  done
-}
-
-
 
 
 writelog() {

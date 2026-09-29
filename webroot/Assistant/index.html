@@ -261,8 +261,8 @@ const faq = {
   "General": [
     { q:"What are the requirements?", a:"Well, it depends on your ROM, Zygisk isn't needed if you're using Google pixel stock ROM. Anyways here are the recommended modules which works universally on all devices. <p> 1. Tricky Store <p/> <p> 2. Integrity Box <p/> <p> 3. Zygisk Next <p/> <p> You can download them by opening integrity box's webui  <p/> <p> <p/> <p> Module Settings > Integrity downloader<p> . <p/> Go back to modules tab & click on integrity box's action button. Modules will be downloaded into /sdcard/Downloads/IntegrityModules folder<p/>" },
     { q:"Why does my device pass Play Integrity but still fail ‘Device certification / license’ within apps?", a:"Passing Play Integrity doesn’t always mean device is certified. <p> Google Play certification/licensing checks may also require valid GMS certification, correct vendor‑partition signatures, valid attestation keys, and genuine vendor keybox. <p> If those are tampered with (by custom ROM, modded firmware, or spoof), apps checking “certified device status” might still fail even if integrity test passes." },
-    { q:"Fix Device not Certified", a:"You need to pass atleast DEVICE INTEGRITY then Open WebUI, Go to FIX DEVICE IS NOT CERTIFIED button, keep in mind that your root & zygisk should be hidden properly, otherwise it won't work." },
-    { q:"I don't know how to use WebUI", a:"I got you bro, If you're using magisk, then you've to Install KSU WebUI app & grant it root permission to use WebUI features of you're installed modules. <p> If you want to know about the usage of a specific setting, check Integrity Box's github repository, everything is well explained there. <p\>" },
+    { q:"Fix Device not Certified", a:"Pass DEVICE INTEGRITY first, then open WebUI > Integrity Profile and apply a profile. Clearing Play Store and Play Services data from the same page usually helps GMS re-read the spoofed state. Your root and zygisk must be hidden properly, otherwise it won't work." },
+    { q:"I don't know how to use WebUI", a:"If you're using magisk, then you've to Install KSU WebUI app & grant it root permission to use WebUI features of you're installed modules. <p> If you want to know about the usage of a specific setting, check Integrity Box's github repository, everything is well explained there. <p\>" },
     { q:"Fingerprint not working", a:"Open WebUI, Go to MODULE SETTING, and enable KILL SWITCH toggle & reboot your device" },
     { q:"Magisk Tips?", a:"If you're using magisk, make sure to disable magisk's built-in Zygisk & add your banking apps into denylist. GMS & Play Services process will be added automatically via Integrity Box. Also hide your magisk app by changing it's name from magisk settings.." }
   ],
@@ -295,11 +295,11 @@ const faq = {
 /* KEYWORD FILTERS */
 const filters = {
   "root": "Root detection info: Integrity-Box cannot fully hide root by itself.",
-  "useless": "😂😂😂",
+  "useless": "Please describe the issue you are facing.",
   "telegram": "Check our Updates Channel: https://t.me/MeowRedirect",
-  "hi": "Hi bro, please select your query so that I can assist you",
-  "hello": "Hi bro, please select your query so that I can assist you",
-  "thank": "Welcome dude, Happy to help you 😊",
+  "hi": "Hi, please select your query so that I can assist you",
+  "hello": "Hi, please select your query so that I can assist you",
+  "thank": "You're welcome. Happy to help.",
   "pif": "Starting from v28, PIF is not needed when using integrity box",
   "bug": "You can report bugs here: https://t.me/TempMeow"
 };

@@ -863,7 +863,7 @@ async function init(){
 
  const adv = await hasAdvancedSettings(propFile);
  if(!adv){
-   showWarning("Change your current profile brother");
+    showWarning("Change your current profile");
    KEYS.forEach(k => setDisabled(k, true));
    refreshBehaviourStates();
    return;
