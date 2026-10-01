@@ -1,21 +1,20 @@
-## v43-lean (unofficial fork)
+## v1.0.0 — StrongBox
 
-> Lean fork of IntegrityBox v43. Not affiliated with the upstream author. Upstream support: https://meowdump.github.io/
+> Cleaned-up community fork of [IntegrityBox](https://github.com/MeowDump/Integrity-Box) by MeowDump. Not affiliated with the original author.
 
-- Rebranded as an unofficial fork: new module identity (name/author/support/update sources), README attribution, WebUI help links now point to this fork
-- Kept `id=playintegrityfix` on purpose — it is a drop-in replacement for PlayIntegrityFix/IntegrityBox and all on-device paths depend on it
+- New identity: **StrongBox**, with its own versioning (starting at `1.0.0`; base: IntegrityBox v43)
+- De-branded the UI: MeowDump custom font dropped, "Meow Hub" → "Utility Hub", upstream tagline replaced, page titles/footers renamed, emoji-free cosmetics
+- Kept `id=playintegrityfix` on purpose — StrongBox is a drop-in replacement for PlayIntegrityFix / IntegrityBox and all on-device paths depend on it
 - Removed dead and unreachable code across shell scripts and WebUI
 - Deduplicated helpers; fixed latent bugs (WebUI shell bridge returning empty results, mksh-unsafe brace expansion, unconditional success logs)
 - WebUI rebuilt on a single design system (−51% lines, same features)
-- Updated `.box_cleanup.sh` signature to match the new support line (prevents false "module removed" cleanup at boot)
-- Regenerated `toolkit/modulehash` for the new `module.prop`
+- Updated `.box_cleanup.sh` signature and `toolkit/modulehash` for the new `module.prop`
+- Added `build.sh`: assembles a flashable zip from this repo + a donor release zip, regenerating the install-time integrity manifest
 
 ---
 
 
 > Release Date: 27/09/2026
-
-####  [🏆 Click here to support my work](https://meowdump.github.io/)
 
 # What's New?
 

@@ -1,8 +1,13 @@
+# StrongBox
+
+Community fork of [IntegrityBox](https://github.com/MeowDump/Integrity-Box) by MeowDump — a Play Integrity & system environment toolkit, cleaned up and de-branded.
+
 > [!WARNING]
 > **Unofficial fork — not affiliated with or endorsed by the original author.**
-> This is a community "lean" fork of [MeowDump/Integrity-Box](https://github.com/MeowDump/Integrity-Box) (GPL-3.0). It keeps the upstream feature set but removes dead code, deduplicates helpers, fixes latent bugs and rebuilds the WebUI on a single design system.
+> StrongBox keeps the upstream v43 feature set, but removes dead code, deduplicates helpers, fixes latent bugs, rebuilds the WebUI on a single design system, and drops MeowDump-specific branding (custom font, name, links).
 >
-> - **Install notes:** the module intentionally keeps `id=playintegrityfix` so it cleanly replaces PlayIntegrityFix / upstream IntegrityBox and shares their on-device paths. Do **not** flash it alongside another PIF-style module.
+> - **Versioning:** this fork has its own versioning — currently `1.0.0` (base: IntegrityBox v43). The module ID stays `playintegrityfix` on purpose: StrongBox is a drop-in replacement for PlayIntegrityFix / IntegrityBox (upstream, by MeowDump) and all on-device paths depend on it. Do **not** flash it alongside another PIF-style module.
+> - **Building:** `./build.sh <donor-release.zip>` assembles a flashable zip and regenerates the install-time integrity manifest (see script header for details).
 > - **Runtime dependencies:** keybox updates, keybox status, auto-pilot files and translations are still fetched from upstream MeowDump repositories at runtime (deliberate dependency).
 > - **Support:** fork-specific bugs belong in [this repo's issues](https://github.com/dacrab/Integrity-Box/issues). Upstream community links are kept where they are still useful.
 > - **License:** GPL-3.0. Original work © MeowDump and contributors; fork changes © dacrab. See [LICENSE](LICENSE).
@@ -11,14 +16,14 @@
 <details>
 <summary><strong>Requirements</strong></summary>
 
-> Please make sure you have the following **modules installed** before using Integrity Box:
+> Please make sure you have the following **modules installed** before using StrongBox:
 
 1) - [**Tricky Store OOS**](https://github.com/beakthoven/TrickyStoreOSS/releases) or [**TEE Simulator**](https://github.com/JingMatrix/TEESimulator/releases) (use any one)
 
 2) - [**Zygisk Next**](https://github.com/Dr-TSNG/ZygiskNext/releases) or [**Meow Zygisk**](https://github.com/MeowDump/MeowZygisk/releases) (use any one) (ZygiskNext is recommended for magisk)
 
 
-> - If you are using Google Pixel stock ROM, or if you want to use your custom ROM's inbuilt spoofing feature, you do not need Zygisk. Simply create a file or folder named `zygisk` in your internal storage `/sdcard/zygisk` (make sure the name is exactly lowercase), and then flash Integrity Box. This will disable all zygisk related components and grant you full CONTROL without any conflict
+> - If you are using Google Pixel stock ROM, or if you want to use your custom ROM's inbuilt spoofing feature, you do not need Zygisk. Simply create a file or folder named `zygisk` in your internal storage `/sdcard/zygisk` (make sure the name is exactly lowercase), and then flash StrongBox. This will disable all zygisk related components and grant you full CONTROL without any conflict
 
 #
 </details>
@@ -26,25 +31,25 @@
 <details>
 <summary><strong>FAQ</strong></summary>
 
-- **What is IntegrityBox?**  
+- **What is StrongBox?**  
   A complete Play Integrity compatibility and system-signal management toolkit.
 
-- **Who should use IntegrityBox?**  
+- **Who should use StrongBox?**  
   Rooted users and custom ROM users who care about Play Integrity reliability.
 
-- **Why was IntegrityBox created?**  
-  Honestly? It started because so many people were selling keyboxes and I thought, “this is bad, everyone should have access to this for free.” So I made a tool that just gives you keyboxes without paying a cent. Then, well… I kept adding stuff. I kept improving things, fixing bugs, adding new ways to spoof, hide, clean, and optimize. And before I knew it… it turned into a beast of a module, probably the most powerful Play Integrity Fix anyone’s ever seen. It has so many features now that even I sometimes forget half of them 😭. But yeah, that’s the story: started small, got greedy with features, and now it’s the one-stop solution for anyone who wants STRONG or DEVICE integrity without the headaches. Just flash & forget, no need to do anything manually.
+- **Why was StrongBox created?**  
+  Honestly? It started because so many people were selling keyboxes and I thought, “this is bad, everyone should have access to this for free.” So I made a tool that just gives you keyboxes without paying a cent. Then, well… I kept adding stuff. I kept improving things, fixing bugs, adding new ways to spoof, hide, clean, and optimize. And before I knew it… it turned into a beast of a module, probably the most powerful Play Integrity Fix anyone’s ever seen. It has so many features now that even I sometimes forget half of them. But yeah, that’s the story: started small, got greedy with features, and now it’s the one-stop solution for anyone who wants STRONG or DEVICE integrity without the headaches. Just flash & forget, no need to do anything manually.
 
-- **Does IntegrityBox replace Play Integrity Fix/Fork module?**  
-  Yes! Starting from v28, PIF is fully integrated into IntegrityBox. The module ID was changed to `playintegrityfix` to avoid conflicts, because honestly, using both at the same time doesn’t make sense. IntegrityBox now handles everything PIF did, plus all the extra features I’ve added along the way
+- **Does StrongBox replace Play Integrity Fix/Fork module?**  
+  Yes! PIF is fully integrated into StrongBox. The module ID is kept as `playintegrityfix`, because honestly, using both at the same time doesn’t make sense. StrongBox handles everything PIF did, plus the extra features on top
   
-- **Does IntegrityBox improve compatibility with banking apps**  
+- **Does StrongBox improve compatibility with banking apps**  
   Yes.
 
 - **Does it support DEVICE and STRONG integrity?**  
   Yes, make sure you have installed tricky store or TEE simulator module.
 
-- **Is IntegrityBox safe to use?**  
+- **Is StrongBox safe to use?**  
   Yes.
 
 - **Does it modify user data?**  
@@ -83,7 +88,7 @@
 - **Is it safe to uninstall?**  
   Yes.
 
-- **Does IntegrityBox collect any data?**  
+- **Does StrongBox collect any data?**  
   No.
 
 - **Does it include telemetry or tracking?**  
@@ -192,7 +197,7 @@
 - **[Deprecated]** ~Switch Shamiko & NoHello modes~
 
 ### Many more features exist, but these are the most notable ones. 
-### (Honestly, I got tired writing them 😭)
+### (Honestly, I got tired writing them)
 
 #
 </details>
@@ -200,13 +205,13 @@
 <details>
 <summary><strong>About Module Settings</strong></summary>
 
-- `Safe Mode :` Enable this & reboot your device if you face any issue after flashing integrity box, this will disable all experimental settings.
+- `Safe Mode :` Enable this & reboot your device if you face any issue after flashing StrongBox, this will disable all experimental settings.
 - `Debug Fingerprint :` cleans debug tag from fingerprint to bypass custom rom detection and pass play integrity with stock fingerprint
 - `Debug Build :` spoofs developement build as user
 - `Build Tag :` spoofs build tag to bypass custom rom detection
 - `Storage Encryption :` spoofs device storage as encrypted to fool banking apps
 - `Spoof Custom Recovery :` spoofs custom recovery folder to bypass root detection
-- `Get Recommended Modules :` the most easiest and trusted way to download modules which are recommended to use with IntegrityBox
+- `Get Recommended Modules :` the most easiest and trusted way to download modules which are recommended to use with StrongBox
 - `No Redirect :` you won't be redirected to release source on installation
 #
 </details>
@@ -238,10 +243,10 @@ Play Integrity may fail if any of the following conditions are present:
 - **Conflicting Magisk / KernelSU / LSPosed modules**
 - **Revoked or invalid keybox**
 - **Banned fingerprint**
-- **ROM inbuilt GMS spoofing is enabled (create `/sdcard/zygisk` & flash IntegrityBox if you want to use ROM's inbuilt spoofing with IntegrityBox)**
+- **ROM inbuilt GMS spoofing is enabled (create `/sdcard/zygisk` & flash StrongBox if you want to use ROM's inbuilt spoofing with StrongBox)**
 - **ROM inbuilt Play Store spoofing is enabled**
 - **Root access is visible or not properly hidden**
-- **IntegrityBox is not updated to the latest version**
+- **StrongBox is not updated to the latest version**
 - **Tricky Store is out of sync and requires reflashing**
 
 Ensure all requirements are met and recheck this list before reporting an issue.
@@ -281,7 +286,7 @@ Ensure all requirements are met and recheck this list before reporting an issue.
 <summary><strong>Report a Problem</strong></summary>
   
 - Use Report a bug/issue button in WebUI to report bugs/issues/feedback
-- Enable `SAFE MODE` toggle from webui > `module settings` and reboot your device if you're facing any issue after flashing IntegrityBox. This wil disable all experimental features.
+- Enable `SAFE MODE` toggle from webui > `module settings` and reboot your device if you're facing any issue after flashing StrongBox. This wil disable all experimental features.
 #
 </details>
 

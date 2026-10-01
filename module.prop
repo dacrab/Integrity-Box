@@ -1,11 +1,10 @@
 id=playintegrityfix
-name=IntegrityBox Lean 📦
-version=v43-lean
-versionCode=43001
+name=StrongBox
+version=1.0.0
+versionCode=10000
 author=dacrab
 support=https://github.com/dacrab/Integrity-Box/issues
 actionIcon=key.png
 webuiIcon=box.png
 updateJson=https://raw.githubusercontent.com/dacrab/Integrity-Box/refs/heads/main/release.json
-banner=https://4kwallpapers.com/images/walls/thumbs_2t/19472.jpg
-description=Unofficial lean fork of IntegrityBox — Play Integrity compatibility & system environment toolkit (based on MeowDump/Integrity-Box)
+description=Play Integrity & system environment toolkit — unofficial community build

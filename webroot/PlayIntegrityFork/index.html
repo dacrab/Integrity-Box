@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Play Integrity Box</title>
+<title>Play Integrity</title>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <style>
 :root{
@@ -429,7 +429,7 @@ h1 .material-icons{
  <div class="header-actions">
    <button class="icon-btn" onclick="openInfoModal()"><span class="material-icons">info</span></button>
  </div>
- <h1><span class="material-icons">verified_user</span>Play Integrity Box</h1>
+ <h1><span class="material-icons">verified_user</span>Play Integrity</h1>
  <div class="subtitle">Droidguard Spoofer</div>
 
  <div id="warningLine" class="warning-line">
@@ -582,7 +582,7 @@ h1 .material-icons{
    <span>Restart Services</span>
  </div>
 
- <div class="footer">&copy; IntegrityBox &bull; 2026</div>
+ <div class="footer">&copy; StrongBox &bull; 2026</div>
 </div>
 
 <div id="toast" class="toast">
@@ -604,8 +604,8 @@ const behaviourFlags = [
  {id:"advanced",icon:"tune",title:"Advanced Mode",label:"behaviour",desc:"Enabling this will preserve spoofing settings otherwise they'll be reset automatically when you run action. Please do not disable this toggle."},
  {id:"strong",icon:"security",title:"Strong Mode",label:"behaviour",desc:"Applies aggressive integrity checks and stronger property spoofing to bypass advanced detection methods."},
  {id:"verbose",icon:"article",title:"Verbose Mode",label:"behaviour",desc:"Enables detailed logging of all PIF operations for debugging and troubleshooting purposes. Only enable if you know what you're doing."},
- {id:"skip_json",icon:"code_off",title:"Skip JSON",label:"behaviour",desc:"Generates a valid meow.json file in your device's internal storage (/sdcard) whenever you trigger the Integrity Box action. The generated file can then be manually imported into your custom ROM's spoofing settings. Recommended for users running Integrity Box in ZYGISKLESS Mode. (ROM's inbuilt spoofing)."},
- {id:"skip_key",icon:"vpn_key_off",title:"Skip Key",label:"behaviour",desc:"Generates a valid keybox.xml file in your device's internal storage (/sdcard) whenever you trigger the Integrity Box action. The generated file can then be manually imported into your custom ROM's spoofing settings. Recommended for users running Integrity Box in ZYGISKLESS Mode. (ROM's inbuilt spoofing)."}
+ {id:"skip_json",icon:"code_off",title:"Skip JSON",label:"behaviour",desc:"Generates a valid meow.json file in your device's internal storage (/sdcard) whenever you trigger the StrongBox action. The generated file can then be manually imported into your custom ROM's spoofing settings. Recommended for users running StrongBox in ZYGISKLESS Mode. (ROM's inbuilt spoofing)."},
+ {id:"skip_key",icon:"vpn_key_off",title:"Skip Key",label:"behaviour",desc:"Generates a valid keybox.xml file in your device's internal storage (/sdcard) whenever you trigger the StrongBox action. The generated file can then be manually imported into your custom ROM's spoofing settings. Recommended for users running StrongBox in ZYGISKLESS Mode. (ROM's inbuilt spoofing)."}
 ];
 
 const pifRows = [
@@ -855,7 +855,7 @@ async function init(){
  }
 
  if(!propFile){
-   showWarning("Change IntegrityBox profile first");
+   showWarning("Change StrongBox profile first");
    KEYS.forEach(k => setDisabled(k, true));
    refreshBehaviourStates();
    return;

@@ -27,7 +27,7 @@ debug() {
 # Verify module integrity
 check_integrity() {
     debug "========================================="
-    debug "          Integrity Box Installer    "
+    debug "          StrongBox Installer    "
     debug "========================================="
     debug "Verifying Module Integrity"
     
@@ -187,7 +187,7 @@ check_arch() {
 }
 
 set_integritybox_profile() {
-    debug " Setting IntegrityBox Profile"
+    debug " Setting StrongBox Profile"
         if [ "$SDK" -ge 33 ]; then
             touch "$FLAG/pixelify"
         else

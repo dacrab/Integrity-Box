@@ -10,7 +10,7 @@ PIF_PROP="/data/adb/modules/playintegrityfix/custom.pif.prop"
 [ -f "$CONFIG_TOML" ] || exit 0
 [ -f "$PIF_PROP" ] || exit 0
 
-# Read values from Integrity Box spoofer
+# Read values from StrongBox spoofer
 get_prop() {
     grep -i "^$1=" "$PIF_PROP" 2>/dev/null | cut -d '=' -f2- | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
 }
