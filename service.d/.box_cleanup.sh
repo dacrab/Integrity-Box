@@ -8,7 +8,7 @@
 # It only runs if IntegrityBox is not installed
 
 PROP_FILE="/data/adb/modules/playintegrityfix/module.prop"
-REQUIRED_LINE="support=https://t.me/MeowDump"
+REQUIRED_LINE="support=https://github.com/dacrab/Integrity-Box/issues"
 LOG_DIR="/data/adb/Box-Brain"
 
 SERVICE_FILES="

@@ -1,3 +1,13 @@
+> [!WARNING]
+> **Unofficial fork — not affiliated with or endorsed by the original author.**
+> This is a community "lean" fork of [MeowDump/Integrity-Box](https://github.com/MeowDump/Integrity-Box) (GPL-3.0). It keeps the upstream feature set but removes dead code, deduplicates helpers, fixes latent bugs and rebuilds the WebUI on a single design system.
+>
+> - **Install notes:** the module intentionally keeps `id=playintegrityfix` so it cleanly replaces PlayIntegrityFix / upstream IntegrityBox and shares their on-device paths. Do **not** flash it alongside another PIF-style module.
+> - **Runtime dependencies:** keybox updates, keybox status, auto-pilot files and translations are still fetched from upstream MeowDump repositories at runtime (deliberate dependency).
+> - **Support:** fork-specific bugs belong in [this repo's issues](https://github.com/dacrab/Integrity-Box/issues). Upstream community links are kept where they are still useful.
+> - **License:** GPL-3.0. Original work © MeowDump and contributors; fork changes © dacrab. See [LICENSE](LICENSE).
+> - **Want the official module?** Use the [upstream repo](https://github.com/MeowDump/Integrity-Box) and its releases.
+
 <details>
 <summary><strong>Requirements</strong></summary>
 
