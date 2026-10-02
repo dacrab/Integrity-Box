@@ -160,6 +160,18 @@ else
     pass "no build artifacts tracked"
 fi
 
+if ls dist/*.zip >/dev/null 2>&1 && command -v unzip >/dev/null 2>&1; then
+    ZIP_ONE="$(ls dist/*.zip | head -n1)"
+    if unzip -l "$ZIP_ONE" | grep -qE ' (tests/|DEVELOPING|\.shellcheckrc|\.editorconfig|build\.sh|\.git)'; then
+        fail "dev files leaked into $(basename "$ZIP_ONE")"
+        unzip -l "$ZIP_ONE" | grep -E ' (tests/|DEVELOPING|\.shellcheckrc|\.editorconfig|build\.sh|\.git)' | sed 's/^/        /'
+    else
+        pass "$(basename "$ZIP_ONE") contains no dev files"
+    fi
+else
+    printf '  skip  no dist/*.zip to inspect\n'
+fi
+
 if [ -n "${DONOR_ZIP:-}" ] && [ -f "${DONOR_ZIP:-}" ]; then
     head2 "full build + manifest verify (DONOR_ZIP set)"
     if bash build.sh "$DONOR_ZIP" >/tmp/sb_build.out 2>&1; then

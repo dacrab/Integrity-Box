@@ -100,6 +100,10 @@ echo "==> overlaying repository files"
     --exclude='./build.sh' \
     --exclude='./dist' \
     --exclude='./assets' \
+    --exclude='./DEVELOPING.md' \
+    --exclude='./tests' \
+    --exclude='./.editorconfig' \
+    --exclude='./.shellcheckrc' \
     --exclude='./PlayIntegrityFork' \
     . ) | ( cd "$BUILD" && tar xf - )
 
