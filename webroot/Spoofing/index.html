@@ -534,6 +534,7 @@ h1 .material-icons{
 </div>
 </div>
 
+<script src="../common.js"></script>
 <script>
 const BASE_DIR = "/data/adb/Box-Brain";
 const FILES = {
@@ -644,6 +645,7 @@ function showLoader(show, text = "Applying changes..."){
 }
 
 function sh(cmd){
+  if (window.SB && SB.exec) return SB.exec(cmd);
   try { return ksu.exec(cmd); } catch { return ""; }
 }
 

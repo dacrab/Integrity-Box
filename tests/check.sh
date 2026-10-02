@@ -83,6 +83,21 @@ else
     printf '  skip  python3 not installed\n'
 fi
 
+head2 "shared webui assets"
+for ref in common.css common.js; do
+    if [ -f "webroot/$ref" ]; then
+        pass "webroot/$ref exists"
+    else
+        fail "missing webroot/$ref (pages link it)"
+    fi
+done
+if grep -rl 'common\.css' webroot/*/index.html >/dev/null 2>&1; then
+    pass "pages link the shared stylesheet"
+fi
+if grep -rl 'common\.js' webroot/*/index.html >/dev/null 2>&1; then
+    pass "pages link the shared bridge"
+fi
+
 head2 "webui pages"
 for f in "${HTML_FILES[@]}"; do
     if grep -q '</html>' "$f"; then

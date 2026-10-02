@@ -1,0 +1,16 @@
+/* StrongBox — shared WebUI stylesheet.
+ *
+ * Loaded by pages that share the list-row / toggle component:
+ *   <link rel="stylesheet" href="../common.css">
+ *
+ * NOTE: the WebUI pages historically shipped independent design systems
+ * (11 different `*` resets, 9 different toast implementations). Only rules
+ * that are byte-identical across all consuming pages live here; anything
+ * page-specific stays inline. If you add a rule here, make sure every page
+ * that links this file already ships it identically, or the cascade will
+ * shift. See DEVELOPING.md ("WebUI architecture").
+ */
+
+.row:active { transform: scale(0.98); }
+
+.switch input { position: absolute; opacity: 0; width: 0; height: 0; }

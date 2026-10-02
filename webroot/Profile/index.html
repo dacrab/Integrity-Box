@@ -561,6 +561,7 @@ Play Integrity Profile
 </div>
 </div>
 
+<script src="../common.js"></script>
 <script>
 const PXL_FILE="/data/adb/Box-Brain/pixelify";
 const ADV_FILE="/data/adb/Box-Brain/advanced";
@@ -639,7 +640,8 @@ if(show){
 }
 
 function sh(cmd){
-try { return ksu.exec(cmd); } catch { return ""; }
+  if (window.SB && SB.exec) return SB.exec(cmd);
+  try { return ksu.exec(cmd); } catch { return ""; }
 }
 
 async function getActive(){

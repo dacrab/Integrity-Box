@@ -117,6 +117,20 @@ rm -f  "$BUILD/webroot/meowna.ttf" \
        "$BUILD/webroot/marked.min.js" \
        "$BUILD/webroot/service-worker.js"
 
+# Donor-only helper scripts that nothing in this fork invokes. Upstream calls
+# them from donor files our fork replaces (action.sh / post-fs-data.sh / the
+# Control page), so they are dead weight here. Keep teesim.sh — it IS used.
+rm -f "$BUILD/webroot/common_scripts/gms.sh" \
+      "$BUILD/webroot/common_scripts/hehe.sh" \
+      "$BUILD/webroot/common_scripts/hma.sh" \
+      "$BUILD/webroot/common_scripts/kernel.sh" \
+      "$BUILD/webroot/common_scripts/multiroot.sh" \
+      "$BUILD/webroot/common_scripts/scan_keybox.sh" \
+      "$BUILD/webroot/common_scripts/updateprop.sh" \
+      "$BUILD/webroot/common_scripts/webui.sh" \
+      "$BUILD/webroot/common_scripts/zygisk.sh"
+rm -f "$BUILD/toolkit/stock.prop"   # only read by the removed updateprop.sh
+
 echo "==> regenerating toolkit/modulehash"
 printf '%s' "$($SHA "$BUILD/module.prop" | cut -d' ' -f1)" > "$BUILD/toolkit/modulehash"
 

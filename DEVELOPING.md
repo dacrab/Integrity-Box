@@ -68,6 +68,8 @@ Handles OTA fingerprint updates (`key.sh`), per-app spoofing migration, patch-da
 - `webroot/common_scripts/*.sh` are invoked by buttons and boot logic; they log to `Box-Brain/Integrity-Box-Logs/`. Keep them standalone-runnable (`sh script.sh`).
 - i18n: pages load `TRANSLATIONS/meow.js`, which builds `window.i18nDict` from per-language packs keyed by normalized English strings (English is the fallback). New UI strings keep working untranslated until the packs (upstream submodule) catch up.
 - Two skins: the default root files and the "modern" variant under `common_scripts/UI/`. When you change shared UI, update both.
+- **Shared layer:** `webroot/common.css` + `webroot/common.js` are the canonical place for styles/helpers shared by sub-pages (`common.js` exposes `SB.exec` / `SB.execAsync`, the single shell bridge). New pages should use them instead of hand-rolling `ksu.exec`.
+  ⚠ The legacy pages still ship *independent* design systems (measured: 11 different `*` resets, 9 different `popup()` implementations), so only rules/helpers that are byte-identical across every consumer belong in the shared files — anything else would shift the cascade. Unifying the pages onto one design system is the real "consolidation" win (~−50% lines) but is a deliberate redesign, not a mechanical edit; it is tracked as a follow-up rather than done piecemeal.
 
 ## Remote dependencies (runtime, by design)
 
@@ -87,7 +89,7 @@ To self-host later, point these URLs at your fork and maintain the files yoursel
 
 - The donor zip provides prebuilt PIF binaries that are not tracked here: `classes.dex`, `zygisk/*.so`, `legacy/*`, `osm0sis.sh`, `migrate.sh`, `credits.md`, `META-INF/`. Use the upstream IntegrityBox release matching this fork's base (v43) or a PlayIntegrityFork release zip.
 - Repo files always win over donor files. Donor-only legacy pages/assets are pruned explicitly (see `build.sh`).
-- The script regenerates `toolkit/modulehash` (sha256 of the shipped `module.prop`) and the `hash` manifest (`relpath|sha256` per shipped file, excluding `META-INF/` and `hash` itself), verifies every entry, then writes `dist/StrongBox-<version>.zip`.
+- Build time: `build.sh` regenerates `toolkit/modulehash` (sha256 of the shipped `module.prop`) and the `hash` manifest (`relpath|sha256` per shipped file, excluding `META-INF/` and `hash` itself), verifies every entry, then writes `dist/StrongBox-<version>.zip`. It also prunes donor-only leftovers the fork no longer uses (legacy upstream pages, the MeowDump font, and unreferenced helper scripts such as `kernel.sh`/`hma.sh`/`hehe.sh`).
 - Output is gitignored (`dist/`, `*.zip`).
 
 ## Versioning & release

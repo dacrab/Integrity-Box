@@ -364,30 +364,6 @@ input:checked + .ios-toggle-slider:before{
 
 @keyframes spin{ to { transform: rotate(360deg); } }
 
-.status-indicator{
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--ios-text-tertiary);
-  margin-right: 8px;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-.status-indicator.active{
-  background: var(--ios-green);
-  box-shadow: 0 0 8px var(--ios-green);
-}
-
-.status-indicator.stale{
-  background: var(--ios-orange);
-  animation: none;
-}
-
-.status-indicator.dead{
-  background: var(--ios-red);
-  animation: none;
-}
-
 @keyframes pulse{
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }

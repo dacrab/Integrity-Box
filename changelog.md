@@ -16,6 +16,12 @@
 - Added GitHub Actions: CI checks on push/PR and an automated release workflow on version tags
 - Added `DEVELOPING.md` (repo map, architecture, conventions, release workflow) plus `.shellcheckrc`, `.editorconfig`, `.gitattributes`
 
+### Cleanup pass 2 (repo + WebUI)
+- Removed unreachable code: `kernel.sh` and `hma.sh` were never invoked (their Flags toggles wrote flag files nothing consumed), plus the dead "Kernel" section in Module Settings and unused placeholder flags
+- Removed provably-dead WebUI code: unused CSS classes and unused JS helpers across the pages
+- Added the shared WebUI layer: `webroot/common.css` and `webroot/common.js` (a single `SB.exec` shell bridge), adopted by the pages that contained the byte-identical rules/simple helpers
+- Documented the shared-layer contract and the follow-up (unifying the pages' divergent design systems) in `DEVELOPING.md`
+
 ---
 
 

@@ -46,7 +46,7 @@ if [ -f "$BOX/disablegms" ]; then
 fi
 
 # Create all placeholder files only if they don't exist
-for file in kill aosp patch xml tee user hma ulock stop start nogms lineage selinux hide resetprop faq nuke zygisknext yesgms; do
+for file in kill aosp patch xml tee user ulock stop start nogms lineage selinux hide resetprop faq nuke zygisknext yesgms; do
     [ -f "$placeholder/$file" ] || touch "$placeholder/$file"
 done
 

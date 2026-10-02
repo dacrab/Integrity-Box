@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>StrongBox Toolkit</title>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="stylesheet" href="../common.css">
 <style>
 :root{
   --bg:#0e1020;
@@ -121,7 +122,6 @@ h1 .material-icons{
   box-shadow:0 8px 24px rgba(0,0,0,0.3);
   border-color:rgba(77,163,255,0.2);
 }
-.row:active{transform:scale(0.98)}
 .row.on{
   background:rgba(77,163,255,0.1);
   border-color:rgba(77,163,255,0.4);
@@ -175,7 +175,6 @@ h1 .material-icons{
   flex-shrink:0;
   pointer-events:none;
 }
-.switch input{position:absolute;opacity:0;width:0;height:0}
 .slider{
   position:absolute;
   inset:0;
@@ -837,10 +836,9 @@ function run(cmd,cb){
   k.exec("sh -c '"+cmd.replace(/'/g,"'\\''")+"'","{}",id);
 }
 
-function has(path,cb){run("[ -f "+path+" ] && echo 1 || echo 0",cb)}
-function readFile(path,cb){run("cat "+path+" 2>/dev/null || echo ''",cb)}
+
 function touch(path,on){if(on)run("mkdir -p "+DIR+" && touch "+path,function(){});else run("rm -f "+path,function(){});}
-function read(key,cb){run("grep -m1 '^"+key+"=' "+PROP+" | cut -d'=' -f2- || echo ''",cb)}
+
 function write(key,val,cb){
   run(
     "mkdir -p $(dirname "+PROP+") && touch "+PROP+" && " +

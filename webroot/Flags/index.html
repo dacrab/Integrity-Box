@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Control Centre</title>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="stylesheet" href="../common.css">
 <style>
 :root{
  --bg:#1f2233;
@@ -114,7 +115,6 @@ h1 .material-icons{
  box-shadow:0 8px 24px rgba(0,0,0,0.3);
  border-color:rgba(77,163,255,0.2);
 }
-.row:active{transform:scale(0.98)}
 .row.active{
  background:rgba(77,163,255,0.1);
  border-color:rgba(77,163,255,0.4);
@@ -191,7 +191,6 @@ h1 .material-icons{
  position:relative;width:54px;height:30px;flex-shrink:0;
  pointer-events:none;
 }
-.switch input{position:absolute;opacity:0;width:0;height:0}
 .slider{
  position:absolute;inset:0;border-radius:999px;
  background:rgba(255,255,255,0.1);
@@ -481,7 +480,7 @@ h1 .material-icons{
 }
 .row-group.action-group{border-left:3px solid rgba(255,170,77,0.35)}
 .row-group.general-group{border-left:3px solid rgba(77,255,136,0.25)}
-.row-group.kernel-group{border-left:3px solid rgba(255,77,77,0.35)}
+
 
 @media(max-width:420px){
  .card{width:100%;padding:22px}
@@ -537,9 +536,6 @@ h1 .material-icons{
  <div class="section-label">General</div>
  <div id="general-rows" class="row-group general-group"></div>
 
- <div class="section-label">Kernel (Not recommended to enable)</div>
- <div id="kernel-rows" class="row-group kernel-group"></div>
-
  <div class="reboot-hint" id="rebootHint">
    <span class="material-icons">restart_alt</span>
    Reboot required to apply changes
@@ -587,18 +583,6 @@ var GENERAL_FLAGS=[
  {id:"iframe_back_button",icon:"arrow_back",title:"Floating Back",desc:"Adds a floating back button overlay for easier iframe navigation."},
  {id:"keyswitch",icon:"wifi",title:"DNS Poisoning:",desc:"This fixes keybox download errors in some regions"},
  {id:"noredirect",icon:"block",title:"No Redirect",desc:"Disables automatic Telegram link redirects from the WebUI."}
-];
-
-var KERNEL_FLAGS=[
- {id:"buildtime",icon:"timer",title:"Spoof Build Time",label:"bootloop / soft brick risk",risk:"high",desc:"Fixed duck detector system & kernel build date mismatch detection"},
- {id:"customkernel",icon:"adb",title:"Hide Custom Kernel",label:"bootloop / soft brick risk",risk:"high",desc:"Fixes custom kernel detection"},
- {id:"emoji",icon:"block",title:"No Gore",label:"bootloop / soft brick risk",risk:"high",desc:"Hides emojis & special characters from kernel string"},
- {id:"chinese",icon:"language",title:"Made in China",label:"bootloop / soft brick risk",risk:"high",desc:"Hides stuff written in chinese language to avoid detection."},
- {id:"telegram",icon:"display_settings",title:"No Telegram",label:"bootloop / soft brick risk",risk:"high",desc:"Hides Telegram strings"},
- {id:"mention",icon:"engineering",title:"No Mention Tags",label:"bootloop / soft brick risk",risk:"high",desc:"Hides Mention strings"},
- {id:"cmdline",icon:"terminal",title:"Spoof CMDline",label:"bootloop / soft brick risk",risk:"high",desc:"spoofs CMDline"},
- {id:"board",icon:"gavel",title:"Spoof Kernel",label:"bootloop / soft brick risk",risk:"high",desc:"Hides Kernel name strings"},
- {id:"scanall",icon:"build",title:"All of Above",label:"bootloop / hard brick risk",risk:"high",desc:"Hides everything"}
 ];
 
 var MESSAGES={
@@ -725,31 +709,6 @@ function createActionRow(cfg){
    '<div class="content">'+
      '<div class="title">'+cfg.title+'</div>'+
      '<div class="badge"><span class="material-icons">play_arrow</span>'+cfg.label+'</div>'+
-   '</div>'+
-   '<div class="status-dot"></div>'+
-   '<label class="switch" onclick="event.stopPropagation()">'+
-     '<input type="checkbox" id="cb-'+cfg.id+'">'+
-     '<span class="slider"><span class="knob"></span></span>'+
-   '</label>';
-
- return div;
-}
-
-function createKernelRow(cfg){
- var div=document.createElement("div");
- div.className="row";
- div.id="row-"+cfg.id;
- div.onclick=function(){toggle(cfg.id)};
-
- var badgeClass=getBadgeClass(cfg.risk);
- var badgeIcon=getBadgeIcon(cfg.risk);
- var badgeText=cfg.label;
-
- div.innerHTML=
-   '<div class="icon-wrap"><span class="material-icons">'+cfg.icon+'</span></div>'+
-   '<div class="content">'+
-     '<div class="title">'+cfg.title+'</div>'+
-     '<div class="badge '+badgeClass+'" id="badge-cb-'+cfg.id+'"><span class="material-icons">'+badgeIcon+'</span>'+badgeText+'</div>'+
    '</div>'+
    '<div class="status-dot"></div>'+
    '<label class="switch" onclick="event.stopPropagation()">'+
@@ -900,25 +859,6 @@ function openInfoModal(){
      }
    });
 
-   var kernelTitle=document.createElement("div");
-   kernelTitle.className="info-section-title";
-   kernelTitle.textContent="Kernel (requires reboot)";
-   content.appendChild(kernelTitle);
-
-   KERNEL_FLAGS.forEach(function(item,i){
-     var div=document.createElement("div");
-     div.className="info-item";
-     var riskColor=item.risk==="high"?"var(--danger)":item.risk==="medium"?"var(--warning)":"var(--success)";
-     var riskText=item.risk==="high"?"High Risk":item.risk==="medium"?"Medium Risk":"Low Risk";
-     div.innerHTML='<div class="info-item-title"><span class="material-icons">'+item.icon+'</span>'+item.title+'</div><div class="info-item-desc">'+item.desc+'</div><div class="info-item-flag">Flag: '+item.id+'</div><div class="info-item-risk" style="color:'+riskColor+'">'+riskText+'</div>';
-     content.appendChild(div);
-     if(i<KERNEL_FLAGS.length-1){
-       var d=document.createElement("div");
-       d.className="modal-divider";
-       content.appendChild(d);
-     }
-   });
-
    var generalTitle=document.createElement("div");
    generalTitle.className="info-section-title";
    generalTitle.textContent="General";
@@ -1006,11 +946,10 @@ async function checkSafeMode(){
 async function refreshAll(){
  var rebootCmd=buildCheckCmd(REBOOT_FLAGS,"reboot");
  var actionCmd=buildCheckCmd(ACTION_FLAGS,"action");
- var kernelCmd=buildCheckCmd(KERNEL_FLAGS,"kernel");
  var generalCmd=buildCheckCmd(GENERAL_FLAGS,"general");
  var execCmd='if [ -f "'+DIR+'/action_exec" ];then echo "exec:action_exec:1";else echo "exec:action_exec:0";fi';
 
- var result=await runShell(rebootCmd+";"+actionCmd+";"+kernelCmd+";"+generalCmd+";"+execCmd);
+ var result=await runShell(rebootCmd+";"+actionCmd+";"+generalCmd+";"+execCmd);
 
  if(result){
    result.trim().split("\n").forEach(function(line){
@@ -1020,7 +959,7 @@ async function refreshAll(){
      var id=parts[1].trim();
      var val=parts[2].trim();
 
-     if(type==="reboot"||type==="action"||type==="kernel"||type==="general"){
+     if(type==="reboot"||type==="action"||type==="general"){
        var cb=document.getElementById("cb-"+id);
        var row=document.getElementById("row-"+id);
        if(cb&&row){
@@ -1046,12 +985,10 @@ async function refreshAll(){
 function init(){
  var flagContainer=document.getElementById("flag-rows");
  var actionContainer=document.getElementById("action-rows");
- var kernelContainer=document.getElementById("kernel-rows");
  var generalContainer=document.getElementById("general-rows");
 
  REBOOT_FLAGS.forEach(function(b){flagContainer.appendChild(createFlagRow(b))});
  ACTION_FLAGS.forEach(function(a){actionContainer.appendChild(createActionRow(a))});
- KERNEL_FLAGS.forEach(function(g){kernelContainer.appendChild(createKernelRow(g))});
  GENERAL_FLAGS.forEach(function(g){generalContainer.appendChild(createGeneralRow(g))});
 
  setTimeout(refreshAll,50);

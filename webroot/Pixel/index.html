@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <title>Device Spoofer</title>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="stylesheet" href="../common.css">
 <style>
 :root{
   --bg:#0e1020;
@@ -74,7 +75,6 @@ body{
   border:1px solid rgba(255,255,255,0.06);transition:all 0.25s cubic-bezier(0.4,0,0.2,1);cursor:pointer;
 }
 .row:hover{background:rgba(255,255,255,0.06);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.3);border-color:rgba(77,163,255,0.2)}
-.row:active{transform:scale(0.98)}
 .row.on{background:rgba(77,163,255,0.1);border-color:rgba(77,163,255,0.4);box-shadow:0 0 20px rgba(77,163,255,0.15)}
 .row.on .icon-wrap{background:var(--accent);box-shadow:0 4px 16px var(--accent-glow)}
 .row.on .icon-wrap .material-icons{color:white}
@@ -90,7 +90,6 @@ body{
 .status-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.2);transition:all 0.3s;flex-shrink:0}
 
 .switch{position:relative;width:58px;height:32px;flex-shrink:0;pointer-events:none}
-.switch input{position:absolute;opacity:0;width:0;height:0}
 .slider{position:absolute;inset:0;border-radius:999px;background:rgba(255,255,255,0.1);transition:all 0.3s;box-shadow:inset 0 2px 4px rgba(0,0,0,0.2)}
 .knob{position:absolute;left:3px;top:3px;width:26px;height:26px;border-radius:50%;background:linear-gradient(145deg,#fff,#e0e0e0);transition:transform 0.25s var(--spring);box-shadow:0 2px 8px rgba(0,0,0,0.3)}
 .switch input:checked+.slider{background:var(--accent);box-shadow:0 0 20px var(--accent-glow)}
