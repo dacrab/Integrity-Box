@@ -7,8 +7,8 @@ Community fork of [IntegrityBox](https://github.com/MeowDump/Integrity-Box) by M
 > StrongBox keeps the upstream v43 feature set, but removes dead code, deduplicates helpers, fixes latent bugs, rebuilds the WebUI on a single design system, and drops MeowDump-specific branding (custom font, name, links).
 >
 > - **Versioning:** this fork has its own versioning — currently `1.0.0` (base: IntegrityBox v43). The module ID stays `playintegrityfix` on purpose: StrongBox is a drop-in replacement for PlayIntegrityFix / IntegrityBox (upstream, by MeowDump) and all on-device paths depend on it. Do **not** flash it alongside another PIF-style module.
-> - **Building:** `./build.sh <donor-release.zip>` assembles a flashable zip and regenerates the install-time integrity manifest (see script header for details).
-> - **Runtime dependencies:** keybox updates, keybox status, auto-pilot files and translations are still fetched from upstream MeowDump repositories at runtime (deliberate dependency).
+> - **Building:** `./build.sh <donor-release.zip>` assembles a flashable zip and regenerates the install-time integrity manifest. `bash tests/check.sh` runs all static checks (also used by CI). See [DEVELOPING.md](DEVELOPING.md) for the repo map, conventions and release workflow.
+> - **Runtime dependencies:** keybox updates, keybox status, auto-pilot files and translations are fetched from upstream MeowDump repositories at runtime; no local mirrors are kept in this repo (deliberate dependency).
 > - **Support:** fork-specific bugs belong in [this repo's issues](https://github.com/dacrab/Integrity-Box/issues). Upstream community links are kept where they are still useful.
 > - **License:** GPL-3.0. Original work © MeowDump and contributors; fork changes © dacrab. See [LICENSE](LICENSE).
 > - **Want the official module?** Use the [upstream repo](https://github.com/MeowDump/Integrity-Box) and its releases.
@@ -220,9 +220,9 @@ Community fork of [IntegrityBox](https://github.com/MeowDump/Integrity-Box) by M
 <summary><strong>About Module Description</strong></summary>
 <table align="center">
   <tr>
-    <td><img src="https://github.com/MeowDump/Integrity-Box/blob/main/assets/valid.png" alt="1" style="max-width: 25%; height: auto;" /></td>
-    <td><img src="https://github.com/MeowDump/Integrity-Box/blob/main/assets/soft.png" alt="2" style="max-width: 25%; height: 2400;" /></td>
-    <td><img src="https://github.com/MeowDump/Integrity-Box/blob/main/assets/revoked.png" alt="3" style="max-width: 25%; height: auto;" /></td>
+    <td><img src="assets/valid.png" alt="1" style="max-width: 25%; height: auto;" /></td>
+    <td><img src="assets/soft.png" alt="2" style="max-width: 25%; height: 2400;" /></td>
+    <td><img src="assets/revoked.png" alt="3" style="max-width: 25%; height: auto;" /></td>
   </tr>
 </table>
   
@@ -257,7 +257,7 @@ Ensure all requirements are met and recheck this list before reporting an issue.
 <details>
 <summary><strong>About WEB UI Dashboard</strong></summary>
 
-<img src="https://github.com/MeowDump/Integrity-Box/blob/main/assets/dashboard.png" width="25%">
+<img src="assets/dashboard.png" width="25%">
 
 - `Profile :` Your current PlayIntegrity Profile
 - `Vending :` Your current PlayStore version
@@ -323,71 +323,65 @@ Play Integrity is stricter than older systems and is actively updated by Google.
 </p>
 
 <div align="center">
-  <a href="https://github.com/MeowDump/Integrity-Box/releases" target="_blank">
-    <img src="https://github.com/MeowDump/MeowDump/blob/main/Assets/download.png" alt="Download Button" width="400">
+  <a href="https://github.com/dacrab/Integrity-Box/releases" target="_blank">
+    <img src="https://img.shields.io/badge/Download-StrongBox%20releases-2ea44f?style=for-the-badge&logo=github" alt="Download StrongBox releases">
   </a>
 </div>
 
 <br>
 
-<div align="center" style="display: flex; justify-content: center; gap: 40px; flex-wrap: nowrap;">
-  <a href="https://t.me/MeowDump" target="_blank">
-    <img src="https://cdn-icons-png.freepik.com/512/1603/1603076.png?ga=GA1.1.2121308824.1769410236" width="150" alt="Telegram Group">
+<div align="center" style="display: flex; justify-content: center; gap: 24px; flex-wrap: wrap;">
+  <a href="https://github.com/dacrab/Integrity-Box/issues" target="_blank">
+    <img src="https://img.shields.io/badge/Report%20a%20bug-GitHub%20issues-blue?style=for-the-badge&logo=github" alt="Report a bug">
   </a>
-  <a href="https://MeowDump.github.io" target="_blank">
-    <img src="https://cdn-icons-png.freepik.com/512/6010/6010222.png?ga=GA1.1.2121308824.1769410236" width="150" alt="Donate">
+  <a href="https://github.com/dacrab/Integrity-Box/releases" target="_blank">
+    <img src="https://img.shields.io/badge/Releases-StrongBox-black?style=for-the-badge&logo=github" alt="Releases">
   </a>
-  <a href="https://t.me/integritybox" target="_blank">
-    <img src="https://cdn-icons-png.freepik.com/512/1593/1593170.png" width="150" alt="Get Keybox">
+  <a href="https://github.com/MeowDump/Integrity-Box" target="_blank">
+    <img src="https://img.shields.io/badge/Upstream-IntegrityBox-lightgrey?style=for-the-badge" alt="Upstream project">
   </a>
 </div>
 
 ## Preview
 <p align="center">
-  <a href="https://github.com/MeowDump/Integrity-Box/stargazers">
-    <img 
-      src="https://m3-markdown-badges.vercel.app/stars/7/1/MeowDump/Integrity-Box" 
-      alt="GitHub Stars" 
-    />
+  <a href="https://github.com/dacrab/Integrity-Box/stargazers">
+    <img src="https://m3-markdown-badges.vercel.app/stars/7/1/dacrab/Integrity-Box" alt="GitHub Stars" />
   </a>
   <br />
-  <a href="https://github.com/MeowDump/Integrity-Box/releases">
-    <img 
-      src="https://img.shields.io/github/downloads/MeowDump/Integrity-Box/total?label=Downloads%20%28excluding%20telegram%20release%29&color=%23ff1493&style=flat" 
-      alt="GitHub Releases" 
-    />
+  <a href="https://github.com/dacrab/Integrity-Box/releases">
+    <img src="https://img.shields.io/github/downloads/dacrab/Integrity-Box/total?label=Downloads&color=%2300add8&style=flat" alt="GitHub Releases" />
   </a>
 </p>
 
 <table align="center">
   <tr>
-    <td><img src="https://github.com/MeowDump/Integrity-Box/blob/main/assets/home.gif" alt="1" style="max-width: 100%; height: auto;" /></td>
-    <td><img src="https://github.com/MeowDump/Integrity-Box/blob/main/assets/toolkit.png" alt="2" style="max-width: 100%; height: auto;" /></td>
-    <td><img src="https://github.com/MeowDump/Integrity-Box/blob/main/assets/simulator.png" alt="3" style="max-width: 100%; height: auto;" /></td>
+    <td><img src="assets/home.gif" alt="1" style="max-width: 100%; height: auto;" /></td>
+    <td><img src="assets/toolkit.png" alt="2" style="max-width: 100%; height: auto;" /></td>
+    <td><img src="assets/simulator.png" alt="3" style="max-width: 100%; height: auto;" /></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/MeowDump/Integrity-Box/blob/main/assets/profile.png" alt="4" style="max-width: 100%; height: auto;" /></td>
-    <td><img src="https://github.com/MeowDump/Integrity-Box/blob/main/assets/pif.png" alt="5" style="max-width: 100%; height: auto;" /></td>
-    <td><img src="https://github.com/MeowDump/Integrity-Box/blob/main/assets/patch.png" alt="6" style="max-width: 100%; height: auto;" /></td>
+    <td><img src="assets/profile.png" alt="4" style="max-width: 100%; height: auto;" /></td>
+    <td><img src="assets/pif.png" alt="5" style="max-width: 100%; height: auto;" /></td>
+    <td><img src="assets/patch.png" alt="6" style="max-width: 100%; height: auto;" /></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/MeowDump/Integrity-Box/blob/main/assets/load.png" alt="7" style="max-width: 100%; height: auto;" /></td>
-    <td><img src="https://github.com/MeowDump/Integrity-Box/blob/main/assets/hash.png" alt="8" style="max-width: 100%; height: auto;" /></td>
-    <td><img src="https://github.com/MeowDump/Integrity-Box/blob/main/assets/fingerprint.png" alt="9" style="max-width: 100%; height: auto;" /></td>
+    <td><img src="assets/load.png" alt="7" style="max-width: 100%; height: auto;" /></td>
+    <td><img src="assets/hash.png" alt="8" style="max-width: 100%; height: auto;" /></td>
+    <td><img src="assets/fingerprint.png" alt="9" style="max-width: 100%; height: auto;" /></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/MeowDump/Integrity-Box/blob/main/assets/ctrlcentre.png" alt="10" style="max-width: 100%; height: auto;" /></td>
-    <td><img src="https://github.com/MeowDump/Integrity-Box/blob/main/assets/certified.png" alt="11" style="max-width: 100%; height: 2400;" /></td>
-    <td><img src="https://github.com/MeowDump/Integrity-Box/blob/main/assets/blacklist.png" alt="12" style="max-width: 100%; height: auto;" /></td>
+    <td><img src="assets/ctrlcentre.png" alt="10" style="max-width: 100%; height: auto;" /></td>
+    <td><img src="assets/certified.png" alt="11" style="max-width: 100%; height: 2400;" /></td>
+    <td><img src="assets/blacklist.png" alt="12" style="max-width: 100%; height: auto;" /></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/MeowDump/Integrity-Box/blob/main/assets/assistant.png" alt="13" style="max-width: 100%; height: auto;" /></td>
-    <td><img src="https://github.com/MeowDump/Integrity-Box/blob/main/assets/apps.png" alt="14" style="max-width: 100%; height: auto;" /></td>
-    <td><img src="https://github.com/MeowDump/Integrity-Box/blob/main/assets/help.png" alt="15" style="max-width: 100%; height: auto;" /></td>
+    <td><img src="assets/assistant.png" alt="13" style="max-width: 100%; height: auto;" /></td>
+    <td><img src="assets/apps.png" alt="14" style="max-width: 100%; height: auto;" /></td>
+    <td><img src="assets/help.png" alt="15" style="max-width: 100%; height: auto;" /></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/MeowDump/Integrity-Box/blob/main/assets/action.png" alt="16" style="max-width: 100%; height: auto;" /></td>
-    <td><img src="https://github.com/MeowDump/Integrity-Box/blob/main/assets/strong.png" alt="17" style="max-width: 100%; height: auto;" /></td>
-    <td><img src="https://github.com/MeowDump/Integrity-Box/blob/main/assets/attestation.png" alt="18" style="max-width: 100%; height: auto;" /></td>
+    <td><img src="assets/action.png" alt="16" style="max-width: 100%; height: auto;" /></td>
+    <td><img src="assets/strong.png" alt="17" style="max-width: 100%; height: auto;" /></td>
+    <td><img src="assets/attestation.png" alt="18" style="max-width: 100%; height: auto;" /></td>
   </tr>
 </table>

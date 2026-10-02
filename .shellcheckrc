@@ -1,0 +1,18 @@
+# StrongBox shellcheck configuration.
+#
+# Shell is auto-detected from each file's shebang: module scripts use
+# `#!/system/bin/sh` (mksh/ash on Android), build tooling uses bash. The
+# `disable=` list below silences the bashisms that Android's mksh/ash DOES
+# support but shellcheck flags for POSIX sh. Everything else must be fixed.
+
+# 'local' is a mksh/ash builtin (not POSIX, but always present on Android)
+disable=SC3043
+
+# ${var//pat/rep} string replacement (mksh/ash supported)
+disable=SC3060
+
+# escaped lexicographical '\>' comparison in test (mksh supported)
+disable=SC3012
+
+# echo flags (-n/-e) in the legacy Magisk<27003 hexpatch fallback (mksh supported)
+disable=SC3037

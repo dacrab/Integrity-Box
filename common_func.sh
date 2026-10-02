@@ -4,12 +4,12 @@ BOX="/data/adb/Box-Brain"
 LOG_FILE="/data/adb/Box-Brain/Integrity-Box-Logs/action.log"
 
 # Single source of truth for the security patch date (TrickyStore + resetprop)
-PATCH_DATE="2026-09-05"
+export PATCH_DATE="2026-09-05"
 
 # Property Backend Setup
 RESETPROP="resetprop"
 PROP_DELETE="resetprop --delete"
-PROP_WAIT="resetprop -w"
+export PROP_WAIT="resetprop -w"
 COMPACT_SUPPORTED=false
 
 # Root Solution Detection & Binary Setup
@@ -396,13 +396,14 @@ sync_omk_injector() {
     fi
 }
 
-P() {
-  for Q in /data/adb/modules/busybox-ndk/system/*/busybox \
-           /data/adb/ksu/bin/busybox \
-           /data/adb/ap/bin/busybox \
-           /data/adb/magisk/busybox; do
-    [ -x "$Q" ] && echo "$Q" && return
-  done
+# Locate a usable busybox binary (echoes its path; empty when none found).
+find_busybox() {
+    for bb in /data/adb/modules/busybox-ndk/system/*/busybox \
+              /data/adb/ksu/bin/busybox \
+              /data/adb/ap/bin/busybox \
+              /data/adb/magisk/busybox; do
+        [ -x "$bb" ] && { echo "$bb"; return; }
+    done
 }
 
 
@@ -478,7 +479,7 @@ ensure_exec_permissions() {
 # license: GPL-3.0
 ##########################################
 
-SKIPDELPROP=false
+export SKIPDELPROP=false
 [ -f "$MODPATH/skipdelprop" ] && SKIPDELPROP=true
 
 # Core Property Functions
@@ -540,7 +541,8 @@ persistprop() {
     
     local NAME="$1"
     local NEWVALUE="$2"
-    local CURVALUE="$(resetprop "$NAME")"
+    local CURVALUE
+    CURVALUE="$(resetprop "$NAME")"
 
     if ! grep -q "$NAME" "$MODPATH/uninstall.sh" 2>/dev/null; then
         if [ "$CURVALUE" ]; then
@@ -562,7 +564,8 @@ resetprop_hexpatch() {
 
     local NAME="$1"
     local NEWVALUE="$2"
-    local CURVALUE="$(resetprop "$NAME")"
+    local CURVALUE
+    CURVALUE="$(resetprop "$NAME")"
 
     [ ! "$NEWVALUE" ] || [ ! "$CURVALUE" ] && return 1
     [ "$NEWVALUE" = "$CURVALUE" ] && [ ! "$FORCE" ] && return 2
@@ -571,12 +574,15 @@ resetprop_hexpatch() {
     if [ -f /dev/__properties__ ]; then
         local PROPFILE=/dev/__properties__
     else
-        local PROPFILE="/dev/__properties__/$(resetprop -Z "$NAME")"
+    local PROPFILE
+    PROPFILE="/dev/__properties__/$(resetprop -Z "$NAME")"
     fi
     [ ! -f "$PROPFILE" ] && return 3
-    local NAMEOFFSET=$(strings -t d "$PROPFILE" | grep "$NAME" | head -1 | cut -d\  -f1)
+    local NAMEOFFSET
+    NAMEOFFSET=$(strings -t d "$PROPFILE" | grep "$NAME" | head -1 | cut -d\  -f1)
 
-    local NEWHEX="$(printf '%02x' "$NEWLEN")$(printf "$NEWVALUE" | od -A n -t x1 -v | tr -d ' \n')$(printf "%$((92-NEWLEN))s" | sed 's/ /00/g')"
+    local NEWHEX
+    NEWHEX="$(printf '%02x' "$NEWLEN")$(printf "$NEWVALUE" | od -A n -t x1 -v | tr -d ' \n')$(printf "%$((92-NEWLEN))s" | sed 's/ /00/g')"
     echo -ne "\x00\x00" | dd obs=1 count=2 seek=$((NAMEOFFSET-96)) conv=notrunc of="$PROPFILE" 2>/dev/null
     echo -ne "$(printf "$NEWHEX" | sed -e 's/.\{2\}/&\\x/g' -e 's/^/\\x/' -e 's/\\x$//')" | dd obs=1 count=93 seek=$((NAMEOFFSET-93)) conv=notrunc of="$PROPFILE" 2>/dev/null
 }

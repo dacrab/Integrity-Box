@@ -10,6 +10,11 @@
 - WebUI rebuilt on a single design system (−51% lines, same features)
 - Updated `.box_cleanup.sh` signature and `toolkit/modulehash` for the new `module.prop`
 - Added `build.sh`: assembles a flashable zip from this repo + a donor release zip, regenerating the install-time integrity manifest
+- Repository cleanup: removed dead upstream mirrors (`auto-pilot/`, `keybox/`, `announcements/`) and unused assets; installer banner de-branded
+- Script hardening: shellcheck warning-clean (beyond documented mksh idioms), fixed word-splitting/quoting issues, renamed `P()` → `find_busybox`
+- Added `tests/check.sh` (syntax, shellcheck, JSON, JS, page-map and identity-consistency checks, de-brand guard)
+- Added GitHub Actions: CI checks on push/PR and an automated release workflow on version tags
+- Added `DEVELOPING.md` (repo map, architecture, conventions, release workflow) plus `.shellcheckrc`, `.editorconfig`, `.gitattributes`
 
 ---
 

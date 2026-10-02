@@ -41,7 +41,7 @@ mkdir -p "$TRICKY_STORE" "$RECORD" "$RECORD/Integrity-Box-Logs" "$BACKUP_DIR"
 touch "$LOG_FILE"
 
 # Get busybox path
-BB=$(P)
+BB=$(find_busybox)
 
 # Backup existing keybox with timestamp
 if [ -s "$KEYBOX" ]; then

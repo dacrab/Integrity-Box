@@ -58,6 +58,17 @@ CODE="$(sed -n 's/^versionCode=//p' "$ROOT/module.prop")"
 [ -n "$VERSION" ] && [ -n "$CODE" ] || { echo "error: cannot read version from module.prop" >&2; exit 1; }
 [ -n "$OUT_NAME" ] || OUT_NAME="StrongBox-$VERSION.zip"
 
+# release.json must track module.prop, or OTA updates break.
+REL_VER="$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' "$ROOT/release.json")"
+REL_CODE="$(sed -n 's/.*"versionCode": *\([0-9]*\).*/\1/p' "$ROOT/release.json")"
+REL_ASSET="$(sed -n 's|.*/download/[^/]*/\([^/"]*\)".*|\1|p' "$ROOT/release.json")"
+[ "$REL_VER" = "$VERSION" ] || { echo "error: release.json version '$REL_VER' != module.prop '$VERSION' (update release.json)" >&2; exit 1; }
+[ "$REL_CODE" = "$CODE" ] || { echo "error: release.json versionCode '$REL_CODE' != module.prop '$CODE' (update release.json)" >&2; exit 1; }
+if [ "$REL_ASSET" != "$OUT_NAME" ]; then
+    echo "note: release.json expects asset '$REL_ASSET', but this build produces '$OUT_NAME'." >&2
+    echo "      Publish it under a tag whose release contains the expected asset name." >&2
+fi
+
 DIST="$ROOT/dist"
 BUILD="$DIST/build"
 OUT="$DIST/$OUT_NAME"
@@ -68,6 +79,9 @@ mkdir -p "$BUILD" "$DIST"
 echo "==> StrongBox $VERSION ($CODE)"
 echo "==> extracting donor: $DONOR"
 unzip -q "$DONOR" -d "$BUILD"
+if [ ! -f "$BUILD/classes.dex" ]; then
+    echo "warning: donor has no classes.dex — is it an IntegrityBox or PlayIntegrityFork release zip?" >&2
+fi
 
 # The integrity manifest is regenerated below; the donor copy must not survive.
 rm -f "$BUILD/hash"
@@ -86,12 +100,7 @@ echo "==> overlaying repository files"
     --exclude='./build.sh' \
     --exclude='./dist' \
     --exclude='./assets' \
-    --exclude='./announcements' \
-    --exclude='./auto-pilot' \
-    --exclude='./keybox' \
-    --exclude='./meow.png' \
     --exclude='./PlayIntegrityFork' \
-    --exclude='./toolkit/meow.json' \
     . ) | ( cd "$BUILD" && tar xf - )
 
 # Donor-only leftovers that are intentionally not part of StrongBox
@@ -108,11 +117,12 @@ echo "==> regenerating toolkit/modulehash"
 printf '%s' "$($SHA "$BUILD/module.prop" | cut -d' ' -f1)" > "$BUILD/toolkit/modulehash"
 
 echo "==> regenerating integrity manifest (hash)"
+HASH_FILE="$BUILD/hash"
 ( cd "$BUILD" && find . -type f ! -path './META-INF/*' ! -name 'hash' -print \
     | sed 's|^\./||' | LC_ALL=C sort \
     | while IFS= read -r f; do
         printf '%s|%s\n' "$f" "$($SHA "$f" | cut -d' ' -f1)"
-    done > hash )
+    done > "$HASH_FILE" )
 
 echo "==> verifying manifest"
 ( cd "$BUILD" && fail=0
@@ -122,9 +132,9 @@ echo "==> verifying manifest"
           echo "MISMATCH: $f" >&2
           fail=1
       fi
-  done < hash
+  done < "$HASH_FILE"
   [ "$fail" -eq 0 ] || exit 1
-  echo "    $(wc -l < hash) entries verified" )
+  echo "    $(wc -l < "$HASH_FILE") entries verified" )
 
 echo "==> packaging"
 rm -f "$OUT"

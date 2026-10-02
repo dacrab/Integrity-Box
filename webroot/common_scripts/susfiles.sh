@@ -5,7 +5,8 @@ LOG="/data/adb/Box-Brain/Integrity-Box-Logs/sus.log"
 mkdir -p "$(dirname "$LOG")" 2>/dev/null
 
 log_msg() {
-    local msg="$(date '+%F %T') | $1"
+    local msg
+    msg="$(date '+%F %T') | $1"
     echo "$msg" >> "$LOG"
     echo "$msg"
 }

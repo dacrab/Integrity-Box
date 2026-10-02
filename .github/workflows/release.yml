@@ -1,0 +1,42 @@
+name: release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  # Donor release zip providing the prebuilt PIF binaries (classes.dex,
+  # zygisk/*.so, legacy/*, osm0sis.sh, ...). Override with the repository
+  # variable DONOR_ZIP_URL (Settings -> Secrets and variables -> Actions).
+  DONOR_ZIP_URL: ${{ vars.DONOR_ZIP_URL || 'https://github.com/MeowDump/Integrity-Box/releases/download/v43/v43-Integrity-Box-26-09-2026.zip' }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download donor zip
+        run: curl -fL --retry 3 -o /tmp/donor.zip "$DONOR_ZIP_URL"
+
+      - name: Static checks + build + manifest verify
+        run: DONOR_ZIP=/tmp/donor.zip bash tests/check.sh
+
+      - name: Upload module artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: strongbox-module
+          path: dist/*.zip
+
+      - name: Publish GitHub release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/*.zip \
+            --title "StrongBox $GITHUB_REF_NAME" \
+            --notes-file changelog.md

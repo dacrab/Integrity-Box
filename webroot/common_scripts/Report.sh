@@ -40,11 +40,10 @@ mask_fingerprint() {
 
     # Last colon-separated part as tag
     local TAGS
-    if [[ "$FP" == *:* ]]; then
-        TAGS="${FP##*:}"
-    else
-        TAGS="unknown"
-    fi
+    case "$FP" in
+        *:*) TAGS="${FP##*:}" ;;
+        *)   TAGS="unknown" ;;
+    esac
 
     echo "${PREFIX}/***MASKED***/${TAGS}"
 }

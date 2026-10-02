@@ -1,0 +1,17 @@
+# Normalize all text files to LF: Android scripts must not carry CRLF.
+* text=auto eol=lf
+
+*.sh        text eol=lf
+*.prop      text eol=lf
+*.js        text eol=lf
+*.html      text eol=lf
+*.css       text eol=lf
+*.json      text eol=lf
+*.md        text eol=lf
+
+*.png       binary
+*.gif       binary
+*.ttf       binary
+*.zip       binary
+*.dex       binary
+*.so        binary

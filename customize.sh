@@ -66,7 +66,7 @@ detect_rom() {
     local TS val
     TS="$(date '+%Y-%m-%d %H:%M:%S')"
 
-    > "$LOG_FILE" 2>/dev/null
+    : > "$LOG_FILE" 2>/dev/null
     echo "ROM Detection Started - $TS" >> "$LOG_FILE" 2>/dev/null
 
     local props="
@@ -257,16 +257,13 @@ install_module() {
     check_arch
 }
 
+SB_VER="$(sed -n 's/^version=//p' "$MODPATH/module.prop")"
 echo "
-  ___     _                _ _        
- |_ _|_ _| |_ ___ __ _ _ _(_) |_ _  _ 
-  | || ' \  _/ -_) _  | '_| |  _| || |
- |___|_||_\__\___\__, |_| |_|\__|\_, |
- | _ ) _____ __  |___/           |__/ 
- | _ \/ _ \ \ /                       
- |___/\___/_\_\                       
-                                                
-                                      
+  =====================================================
+    StrongBox $SB_VER
+    Play Integrity & System Environment Toolkit
+    Unofficial community build (GPL-3.0)
+  =====================================================
 "
 
 # Set fingerprint on installation 

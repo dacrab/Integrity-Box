@@ -91,7 +91,7 @@ log "Download complete: $ZIP_PATH ($(du -h "$ZIP_PATH" 2>/dev/null | cut -f1))"
 
 # Clean extraction directory
 log "Preparing extraction directory: $EXTRACT_DIR"
-rm -rf "$EXTRACT_DIR"/*
+rm -rf "${EXTRACT_DIR:?}"/*
 mkdir -p "$EXTRACT_DIR"
 
 # Find unzip binary
@@ -99,7 +99,7 @@ UNZIP_BIN=""
 if command -v unzip >/dev/null 2>&1; then
     UNZIP_BIN="unzip"
 else
-    BUSYBOX="$(P)"
+    BUSYBOX="$(find_busybox)"
     if [ -n "$BUSYBOX" ] && "$BUSYBOX" unzip --help >/dev/null 2>&1; then
         UNZIP_BIN="$BUSYBOX unzip"
     fi

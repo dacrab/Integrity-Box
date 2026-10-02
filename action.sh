@@ -18,7 +18,6 @@ UPDATE="$SCRIPT_DIR/key.sh"
 PROP="$MODPATH/module.prop"
 BAK="$PROP.bak"
 
-FLAG="$BOX/advanced"
 PATCH_FLAG="$BOX/patch"
 
 PIF_PROP="$MODPATH/custom.pif.prop"
@@ -245,7 +244,10 @@ if [ "$MIGRATE_OK" -eq 1 ] && [ -f "$BOX/json" ] && [ ! -f "$BOX/skip_json" ] &&
                 \#*|"") continue ;;
             esac
             [ "$skip_section" -eq 1 ] && continue
-            [[ "$line" != *=* ]] && continue
+            case "$line" in
+                *=*) ;;
+                *) continue ;;
+            esac
             key="${line%%=*}"
             val="${line#*=}"
             key="${key#*.}"
@@ -329,7 +331,7 @@ fi
 
 # Update module description
 update_description() {
-    bb="$(P)"
+    bb="$(find_busybox)"
     [ -z "$bb" ] && return 0
 
     # Model

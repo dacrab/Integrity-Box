@@ -35,7 +35,7 @@ TAG_FLAG="/data/adb/Box-Brain/tag"
 
 TMP_PROP="$MODPATH/tmp.prop"
 SYSTEM_PROP="$MODPATH/system.prop"
-> "$TMP_PROP" # clear old temp file
+: > "$TMP_PROP" # clear old temp file
 
 # Build summary of active flags
 FLAGS_ACTIVE=""
